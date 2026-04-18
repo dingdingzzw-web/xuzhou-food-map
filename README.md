@@ -71,13 +71,14 @@
 ```bash
 徐州美食地图/
 ├── README.md
-├── 徐州美食地图_MVP需求文档_v1.md
+├── docs/
+│   ├── 徐州美食地图_MVP需求文档_v1.md
+│   ├── SQL说明_v1.md
+│   ├── RLS与Storage规则说明_v1.md
+│   ├── 自定义底图与外跳导航方案_v1.md
+│   └── 开发日志_2026-04-18.md
 ├── supabase_schema_v1.sql
 ├── supabase_rls_storage_v1.sql
-├── SQL说明_v1.md
-├── RLS与Storage规则说明_v1.md
-├── 自定义底图与外跳导航方案_v1.md
-├── 开发日志_2026-04-18.md
 └── web/
     ├── src/
     ├── public/
@@ -119,6 +120,16 @@ NEXT_PUBLIC_AMAP_KEY=
 - 当前项目主地图不依赖高德 JS API
 - `NEXT_PUBLIC_AMAP_KEY` 仅作为可选增强能力保留
 - 就算暂时没有高德 key，也不影响主流程开发
+
+---
+
+## 文档入口
+
+- 产品需求：`docs/徐州美食地图_MVP需求文档_v1.md`
+- SQL 说明：`docs/SQL说明_v1.md`
+- RLS / Storage 说明：`docs/RLS与Storage规则说明_v1.md`
+- 自定义底图方案：`docs/自定义底图与外跳导航方案_v1.md`
+- 开发日志：`docs/开发日志_2026-04-18.md`
 
 ---
 
