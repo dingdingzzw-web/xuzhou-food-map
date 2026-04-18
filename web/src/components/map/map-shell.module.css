@@ -1,0 +1,137 @@
+.mapShell {
+  position: relative;
+  min-height: 560px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f8f3e8 0%, #f4ebdc 100%);
+  border: 1px solid rgba(82, 49, 29, 0.08);
+  box-shadow: 0 30px 80px rgba(88, 60, 34, 0.12);
+}
+
+.mapBackdrop,
+.grid,
+.river,
+.ring {
+  position: absolute;
+  inset: 0;
+}
+
+.grid {
+  background-image:
+    linear-gradient(rgba(142, 104, 74, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(142, 104, 74, 0.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.river {
+  inset: 18% 8% auto auto;
+  width: 58%;
+  height: 40%;
+  border-radius: 50%;
+  background: rgba(124, 176, 211, 0.28);
+  filter: blur(8px);
+  transform: rotate(-18deg);
+}
+
+.ring {
+  inset: auto auto 6% 10%;
+  width: 46%;
+  height: 36%;
+  border: 2px dashed rgba(175, 98, 49, 0.18);
+  border-radius: 42% 58% 54% 46% / 45% 41% 59% 55%;
+  transform: rotate(-8deg);
+}
+
+.badges {
+  position: absolute;
+  inset: 18px 18px auto auto;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 52%;
+}
+
+.badges span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 252, 244, 0.88);
+  border: 1px solid rgba(125, 82, 45, 0.12);
+  color: #7b5638;
+  font-size: 12px;
+}
+
+.marker {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #fff8ef;
+  color: #573521;
+  box-shadow: 0 10px 30px rgba(98, 62, 34, 0.14);
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.marker:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 16px 32px rgba(98, 62, 34, 0.18);
+}
+
+.markerActive {
+  background: #ffedd7;
+  box-shadow: 0 18px 36px rgba(184, 108, 40, 0.24);
+}
+
+.markerIcon {
+  font-size: 18px;
+}
+
+.markerLabel {
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mapHint {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 251, 245, 0.92);
+  border: 1px solid rgba(92, 58, 33, 0.1);
+  color: #6f4c34;
+  max-width: 320px;
+}
+
+.mapHint strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.mapHint p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .mapShell {
+    min-height: 420px;
+  }
+
+  .markerLabel {
+    max-width: 96px;
+  }
+
+  .badges {
+    max-width: 72%;
+  }
+}

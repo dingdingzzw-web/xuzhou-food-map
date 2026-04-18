@@ -1,0 +1,36 @@
+.wrap {
+  position: relative;
+  min-height: 560px;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(82, 49, 29, 0.08);
+  box-shadow: 0 30px 80px rgba(88, 60, 34, 0.12);
+  background: #f7f1e6;
+}
+
+.map {
+  width: 100%;
+  height: 560px;
+}
+
+.badge {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  z-index: 2;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 251, 245, 0.92);
+  border: 1px solid rgba(92, 58, 33, 0.1);
+  color: #6f4c34;
+  font-size: 13px;
+  box-shadow: 0 12px 32px rgba(83, 54, 31, 0.08);
+}
+
+@media (max-width: 900px) {
+  .wrap,
+  .map {
+    min-height: 420px;
+    height: 420px;
+  }
+}
