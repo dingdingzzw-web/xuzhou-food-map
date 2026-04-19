@@ -16,6 +16,7 @@ export default function Home() {
   const [activeShopId, setActiveShopId] = useState(mockShops[0]?.id ?? "");
   const [dataSource, setDataSource] = useState<"supabase" | "mock">("mock");
   const [isLoading, setIsLoading] = useState(true);
+  const [pickerCoords, setPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,7 +99,7 @@ export default function Home() {
           </div>
           <div>
             <strong>数据来源</strong>
-            <span>{dataSource === "supabase" ? "Supabase 实时数据" : "本地 mock 数据"}</span>
+            <span>{dataSource === "supabase" ? "Supabase 实时数据" : "本地 mock 数据（待接真环境）"}</span>
           </div>
         </div>
       </section>
@@ -122,7 +123,9 @@ export default function Home() {
           <ZoomableMap
             shops={filteredShops}
             activeShopId={activeShop?.id}
+            pickerPosition={pickerCoords}
             onSelectShop={(shop) => setActiveShopId(shop.id)}
+            onPickLocation={(coords) => setPickerCoords(coords)}
           />
         </div>
 
@@ -155,7 +158,7 @@ export default function Home() {
           </div>
         </div>
 
-        <UploadShopPanel onCreateShop={handleCreateShop} />
+        <UploadShopPanel onCreateShop={handleCreateShop} selectedCoords={pickerCoords} />
       </section>
     </main>
   );

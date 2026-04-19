@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Shop } from "@/types/shop";
 import styles from "./upload-shop-panel.module.css";
 
@@ -16,12 +16,13 @@ export interface CreateShopInput {
 
 interface UploadShopPanelProps {
   onCreateShop?: (input: CreateShopInput) => Promise<Shop | null>;
+  selectedCoords?: { lat: number; lng: number } | null;
 }
 
 const DEFAULT_LAT = 34.2044;
 const DEFAULT_LNG = 117.28565;
 
-export function UploadShopPanel({ onCreateShop }: UploadShopPanelProps) {
+export function UploadShopPanel({ onCreateShop, selectedCoords }: UploadShopPanelProps) {
   const [form, setForm] = useState<CreateShopInput>({
     name: "",
     address: "",
@@ -33,6 +34,15 @@ export function UploadShopPanel({ onCreateShop }: UploadShopPanelProps) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string>("");
+
+  useEffect(() => {
+    if (!selectedCoords) return;
+    setForm((current) => ({
+      ...current,
+      lat: Number(selectedCoords.lat.toFixed(6)),
+      lng: Number(selectedCoords.lng.toFixed(6)),
+    }));
+  }, [selectedCoords]);
 
   const isValid = useMemo(() => {
     return Boolean(
@@ -90,7 +100,7 @@ export function UploadShopPanel({ onCreateShop }: UploadShopPanelProps) {
         <p className={styles.eyebrow}>上传一家店</p>
         <h2>先把数据闭环跑起来</h2>
         <p className={styles.desc}>
-          先不依赖真实地图选点。上传时默认落在徐州市中心，后面再补地理编码和地图点选。
+          现在已经可以直接在左侧地图上点击选点，先把店铺位置定准，再补图片上传和地址解析。
         </p>
       </div>
 
@@ -165,7 +175,8 @@ export function UploadShopPanel({ onCreateShop }: UploadShopPanelProps) {
 
         <div className={styles.tips}>
           <span>默认坐标是徐州市中心</span>
-          <span>后面再接地图选点和地址解析</span>
+          <span>点左侧地图可自动带入坐标</span>
+          <span>{selectedCoords ? `当前选点：${selectedCoords.lat.toFixed(5)}, ${selectedCoords.lng.toFixed(5)}` : "还没选点时也能先手填坐标"}</span>
         </div>
 
         <button

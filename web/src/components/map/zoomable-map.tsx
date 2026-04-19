@@ -9,7 +9,9 @@ import styles from "./zoomable-map.module.css";
 interface ZoomableMapProps {
   shops: Shop[];
   activeShopId?: string;
+  pickerPosition?: { lat: number; lng: number } | null;
   onSelectShop?: (shop: Shop) => void;
+  onPickLocation?: (coords: { lat: number; lng: number }) => void;
 }
 
 const XUZHOU_CENTER: [number, number] = [117.2857, 34.2044];
@@ -19,10 +21,17 @@ const XUZHOU_BOUNDS: LngLatBoundsLike = [
 ];
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
-export function ZoomableMap({ shops, activeShopId, onSelectShop }: ZoomableMapProps) {
+export function ZoomableMap({
+  shops,
+  activeShopId,
+  pickerPosition,
+  onSelectShop,
+  onPickLocation,
+}: ZoomableMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<Marker[]>([]);
+  const pickerMarkerRef = useRef<Marker | null>(null);
 
   const activeShop = useMemo(
     () => shops.find((shop) => shop.id === activeShopId) ?? shops[0],
@@ -45,15 +54,21 @@ export function ZoomableMap({ shops, activeShopId, onSelectShop }: ZoomableMapPr
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }), "bottom-left");
 
+    map.on("click", (event) => {
+      onPickLocation?.({ lat: event.lngLat.lat, lng: event.lngLat.lng });
+    });
+
     mapRef.current = map;
 
     return () => {
+      pickerMarkerRef.current?.remove();
+      pickerMarkerRef.current = null;
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [onPickLocation]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -76,6 +91,26 @@ export function ZoomableMap({ shops, activeShopId, onSelectShop }: ZoomableMapPr
 
   useEffect(() => {
     const map = mapRef.current;
+    if (!map || !pickerPosition) {
+      pickerMarkerRef.current?.remove();
+      pickerMarkerRef.current = null;
+      return;
+    }
+
+    if (!pickerMarkerRef.current) {
+      const el = document.createElement("div");
+      el.className = styles.picker;
+      el.innerHTML = `<span class="${styles.pickerDot}"></span>`;
+      pickerMarkerRef.current = new maplibregl.Marker({ element: el, anchor: "center" })
+        .setLngLat([pickerPosition.lng, pickerPosition.lat])
+        .addTo(map);
+    } else {
+      pickerMarkerRef.current.setLngLat([pickerPosition.lng, pickerPosition.lat]);
+    }
+  }, [pickerPosition]);
+
+  useEffect(() => {
+    const map = mapRef.current;
     if (!map || !activeShop) return;
 
     map.flyTo({
@@ -94,7 +129,7 @@ export function ZoomableMap({ shops, activeShopId, onSelectShop }: ZoomableMapPr
           <strong>徐州街道级美食地图</strong>
           <p>现在支持拖拽和缩放，先把找店体验做顺，风格化后面再继续收。</p>
         </div>
-        <span className={styles.badge}>可缩放，可点位联动，可外跳导航</span>
+        <span className={styles.badge}>可缩放，可点位联动，可点击地图选点</span>
       </div>
 
       <div ref={containerRef} className={styles.map} />

@@ -89,6 +89,25 @@
   font-weight: 700;
 }
 
+.picker {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(82, 49, 33, 0.16);
+  border: 2px solid rgba(255, 250, 244, 0.95);
+  box-shadow: 0 10px 24px rgba(61, 32, 16, 0.24);
+}
+
+.pickerDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #4e8bff;
+  border: 2px solid #ffffff;
+}
+
 @media (max-width: 900px) {
   .header {
     flex-direction: column;
