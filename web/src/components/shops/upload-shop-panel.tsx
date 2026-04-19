@@ -246,6 +246,7 @@ export function UploadShopPanel({
           {submitting ? "上传中..." : "上传一家店"}
         </button>
 
+        <p className={styles.feedback}>当前坐标：{form.lat.toFixed(6)}, {form.lng.toFixed(6)}</p>
         {feedback ? <p className={styles.feedback}>{feedback}</p> : null}
       </form>
     </section>
