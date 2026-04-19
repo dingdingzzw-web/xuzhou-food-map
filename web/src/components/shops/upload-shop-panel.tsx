@@ -19,7 +19,9 @@ export interface CreateShopInput {
 interface UploadShopPanelProps {
   onCreateShop?: (input: CreateShopInput) => Promise<Shop | null>;
   selectedCoords?: { lat: number; lng: number } | null;
+  pickerEnabled?: boolean;
   onAutoLocate?: (coords: { lat: number; lng: number }) => void;
+  onTogglePicker?: () => void;
 }
 
 const DEFAULT_LAT = 34.2044;
@@ -28,7 +30,9 @@ const DEFAULT_LNG = 117.28565;
 export function UploadShopPanel({
   onCreateShop,
   selectedCoords,
+  pickerEnabled = false,
   onAutoLocate,
+  onTogglePicker,
 }: UploadShopPanelProps) {
   const [form, setForm] = useState<CreateShopInput>({
     name: "",
@@ -68,7 +72,7 @@ export function UploadShopPanel({
     }
 
     if (!hasAmapEnv) {
-      setFeedback("还没配置高德 Key，暂时不能自动定位。先点地图选点，或把 NEXT_PUBLIC_AMAP_KEY 配到 Vercel。 ");
+      setFeedback("还没配置高德 Key，暂时不能自动定位。先开启选点模式手动定位置，或把 NEXT_PUBLIC_AMAP_KEY 配到 Vercel。");
       return;
     }
 
@@ -87,7 +91,8 @@ export function UploadShopPanel({
       setFeedback("定位到了，地图已经跳过去了。如果位置有点偏，再点地图微调一下。");
     } catch (error) {
       console.error("[shops] geocode failed", error);
-      setFeedback("自动定位没命中。你可以把地址写得更完整一点，或者直接点左侧地图选点。");
+      const message = error instanceof Error ? error.message : "unknown_geocode_error";
+      setFeedback(`自动定位没命中（${message}）。你可以把地址写得更完整一点，或者开启选点模式手动定位置。`);
     } finally {
       setLocating(false);
     }
@@ -140,7 +145,7 @@ export function UploadShopPanel({
         <p className={styles.eyebrow}>上传一家店</p>
         <h2>先把数据闭环跑起来</h2>
         <p className={styles.desc}>
-          现在可以先输地址自动定位，再用左侧地图微调坐标。这样上传更快，也不用让用户自己找经纬度。
+          现在可以先输地址自动定位，再按需开启地图选点模式微调坐标。这样上传更快，也不会一碰地图就误选。
         </p>
       </div>
 
@@ -228,6 +233,10 @@ export function UploadShopPanel({
           <span>高德负责地址解析，左侧地图负责微调</span>
           <span>{selectedCoords ? `当前选点：${selectedCoords.lat.toFixed(5)}, ${selectedCoords.lng.toFixed(5)}` : "还没选点时也能先手填坐标"}</span>
         </div>
+
+        <button type="button" className={styles.toggleButton} onClick={onTogglePicker}>
+          {pickerEnabled ? "退出地图选点模式" : "开启地图选点模式"}
+        </button>
 
         <button
           type="submit"

@@ -10,6 +10,7 @@ interface ZoomableMapProps {
   shops: Shop[];
   activeShopId?: string;
   pickerPosition?: { lat: number; lng: number } | null;
+  pickerEnabled?: boolean;
   onSelectShop?: (shop: Shop) => void;
   onPickLocation?: (coords: { lat: number; lng: number }) => void;
 }
@@ -25,6 +26,7 @@ export function ZoomableMap({
   shops,
   activeShopId,
   pickerPosition,
+  pickerEnabled = false,
   onSelectShop,
   onPickLocation,
 }: ZoomableMapProps) {
@@ -55,6 +57,7 @@ export function ZoomableMap({
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }), "bottom-left");
 
     map.on("click", (event) => {
+      if (!pickerEnabled) return;
       onPickLocation?.({ lat: event.lngLat.lat, lng: event.lngLat.lng });
     });
 
@@ -68,7 +71,7 @@ export function ZoomableMap({
       map.remove();
       mapRef.current = null;
     };
-  }, [onPickLocation]);
+  }, [onPickLocation, pickerEnabled]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -101,9 +104,19 @@ export function ZoomableMap({
       const el = document.createElement("div");
       el.className = styles.picker;
       el.innerHTML = `<span class="${styles.pickerDot}"></span>`;
-      pickerMarkerRef.current = new maplibregl.Marker({ element: el, anchor: "center" })
+      pickerMarkerRef.current = new maplibregl.Marker({
+        element: el,
+        anchor: "center",
+        draggable: true,
+      })
         .setLngLat([pickerPosition.lng, pickerPosition.lat])
         .addTo(map);
+
+      pickerMarkerRef.current.on("dragend", () => {
+        const next = pickerMarkerRef.current?.getLngLat();
+        if (!next) return;
+        onPickLocation?.({ lat: next.lat, lng: next.lng });
+      });
     } else {
       pickerMarkerRef.current.setLngLat([pickerPosition.lng, pickerPosition.lat]);
     }
@@ -115,7 +128,7 @@ export function ZoomableMap({
       curve: 1.1,
       essential: true,
     });
-  }, [pickerPosition]);
+  }, [onPickLocation, pickerPosition]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -137,7 +150,7 @@ export function ZoomableMap({
           <strong>徐州街道级美食地图</strong>
           <p>现在支持拖拽和缩放，先把找店体验做顺，风格化后面再继续收。</p>
         </div>
-        <span className={styles.badge}>可缩放，可点位联动，可点击地图选点</span>
+        <span className={styles.badge}>{pickerEnabled ? "选点模式开启，可拖动蓝点精修位置" : "浏览模式，可缩放查看街道和店铺位置"}</span>
       </div>
 
       <div ref={containerRef} className={styles.map} />

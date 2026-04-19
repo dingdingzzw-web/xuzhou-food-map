@@ -103,17 +103,26 @@
   font-size: 12px;
 }
 
+.toggleButton,
 .button {
   border: 0;
   border-radius: 16px;
   padding: 14px 18px;
-  background: #523121;
   color: #fffdf8;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
 }
 
+.toggleButton {
+  background: #a96d46;
+}
+
+.button {
+  background: #523121;
+}
+
+.toggleButton:disabled,
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;

@@ -3,6 +3,7 @@ import { env, hasAmapEnv } from "@/lib/env";
 interface AmapGeocodeResponse {
   status?: string;
   info?: string;
+  infocode?: string;
   geocodes?: Array<{
     location?: string;
     formatted_address?: string;
@@ -30,7 +31,7 @@ export async function geocodeAddress(address: string) {
   const data = (await response.json()) as AmapGeocodeResponse;
 
   if (data.status !== "1" || !data.geocodes?.length || !data.geocodes[0]?.location) {
-    throw new Error(data.info || "amap_geocode_failed");
+    throw new Error(`${data.info || "amap_geocode_failed"}${data.infocode ? `:${data.infocode}` : ""}`);
   }
 
   const [lngText, latText] = data.geocodes[0].location.split(",");

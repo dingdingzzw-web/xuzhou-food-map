@@ -17,6 +17,7 @@ export default function Home() {
   const [dataSource, setDataSource] = useState<"supabase" | "mock">("mock");
   const [isLoading, setIsLoading] = useState(true);
   const [pickerCoords, setPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [pickerEnabled, setPickerEnabled] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -124,6 +125,7 @@ export default function Home() {
             shops={filteredShops}
             activeShopId={activeShop?.id}
             pickerPosition={pickerCoords}
+            pickerEnabled={pickerEnabled}
             onSelectShop={(shop) => setActiveShopId(shop.id)}
             onPickLocation={(coords) => setPickerCoords(coords)}
           />
@@ -161,7 +163,12 @@ export default function Home() {
         <UploadShopPanel
           onCreateShop={handleCreateShop}
           selectedCoords={pickerCoords}
-          onAutoLocate={(coords) => setPickerCoords(coords)}
+          pickerEnabled={pickerEnabled}
+          onAutoLocate={(coords) => {
+            setPickerCoords(coords);
+            setPickerEnabled(true);
+          }}
+          onTogglePicker={() => setPickerEnabled((current) => !current)}
         />
       </section>
     </main>
