@@ -79,7 +79,7 @@ export default function Home() {
           <span className={styles.kicker}>徐州本地共建地图</span>
           <h1>徐州美食地图</h1>
           <p>
-            第一版先把点位、补图、好次 / 包次跑通。地图先用手绘感骨架占位，下一步直接接真实高德地图。
+            第一版先把点位、补图、好次 / 包次跑通。主地图走徐州自定义底图，站内负责种草，导航交给外部地图 App。
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export default function Home() {
           </div>
           <div>
             <strong>技术栈</strong>
-            <span>Next.js + Supabase + 高德</span>
+            <span>Next.js + Supabase + GeoJSON</span>
           </div>
           <div>
             <strong>数据来源</strong>

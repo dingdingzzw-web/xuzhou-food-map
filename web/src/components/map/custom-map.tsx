@@ -25,6 +25,13 @@ interface Point {
   y: number;
 }
 
+interface Bounds {
+  minLng: number;
+  maxLng: number;
+  minLat: number;
+  maxLat: number;
+}
+
 interface CustomMapProps {
   shops: Shop[];
   activeShopId?: string;
@@ -60,11 +67,7 @@ function extractRings(geometryType?: string, coordinates?: unknown): Ring[] {
   return [];
 }
 
-function toSvgPoint(
-  lng: number,
-  lat: number,
-  bounds: { minLng: number; maxLng: number; minLat: number; maxLat: number },
-): Point {
+function toSvgPoint(lng: number, lat: number, bounds: Bounds): Point {
   const padding = 48;
   const innerWidth = VIEW_WIDTH - padding * 2;
   const innerHeight = VIEW_HEIGHT - padding * 2;
@@ -76,6 +79,48 @@ function toSvgPoint(
     x: padding + xRatio * innerWidth,
     y: VIEW_HEIGHT - padding - yRatio * innerHeight,
   };
+}
+
+function getRingCentroid(ring: Ring, bounds: Bounds): Point | null {
+  if (ring.length < 3) return null;
+
+  let area = 0;
+  let cx = 0;
+  let cy = 0;
+
+  for (let index = 0; index < ring.length; index += 1) {
+    const current = ring[index];
+    const next = ring[(index + 1) % ring.length];
+
+    if (!current || !next) continue;
+
+    const [x1, y1] = current;
+    const [x2, y2] = next;
+    const cross = x1 * y2 - x2 * y1;
+    area += cross;
+    cx += (x1 + x2) * cross;
+    cy += (y1 + y2) * cross;
+  }
+
+  if (Math.abs(area) < 1e-7) return null;
+
+  const centroidLng = cx / (3 * area);
+  const centroidLat = cy / (3 * area);
+
+  return toSvgPoint(centroidLng, centroidLat, bounds);
+}
+
+function getLabelPoint(rings: Ring[], bounds: Bounds): Point {
+  const outerRing = rings.reduce<Ring>(
+    (largest, current) => (current.length > largest.length ? current : largest),
+    [],
+  );
+
+  return (
+    getRingCentroid(outerRing, bounds) ||
+    getRingCentroid(rings[0] ?? [], bounds) ||
+    toSvgPoint(117.184811, 34.261792, bounds)
+  );
 }
 
 export function CustomMap({ shops, activeShopId, onSelectShop }: CustomMapProps) {
@@ -132,19 +177,7 @@ export function CustomMap({ shops, activeShopId, onSelectShop }: CustomMapProps)
         )
         .join(" ");
 
-      const allPoints = rings.flat();
-      const center = allPoints.length
-        ? allPoints.reduce(
-            (acc, [lng, lat]) => ({ lng: acc.lng + lng, lat: acc.lat + lat }),
-            { lng: 0, lat: 0 },
-          )
-        : { lng: 117.184811, lat: 34.261792 };
-
-      const labelPoint = toSvgPoint(
-        center.lng / (allPoints.length || 1),
-        center.lat / (allPoints.length || 1),
-        bounds,
-      );
+      const labelPoint = getLabelPoint(rings, bounds);
 
       return {
         id: `${feature.properties?.name || "district"}-${index}`,
