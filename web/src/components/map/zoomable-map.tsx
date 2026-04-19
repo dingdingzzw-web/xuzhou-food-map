@@ -107,6 +107,14 @@ export function ZoomableMap({
     } else {
       pickerMarkerRef.current.setLngLat([pickerPosition.lng, pickerPosition.lat]);
     }
+
+    map.flyTo({
+      center: [pickerPosition.lng, pickerPosition.lat],
+      zoom: Math.max(map.getZoom(), 14.5),
+      speed: 0.8,
+      curve: 1.1,
+      essential: true,
+    });
   }, [pickerPosition]);
 
   useEffect(() => {

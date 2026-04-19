@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { hasAmapEnv } from "@/lib/env";
+import { geocodeAddress } from "@/lib/geocode";
 import type { Shop } from "@/types/shop";
 import styles from "./upload-shop-panel.module.css";
 
@@ -17,12 +19,17 @@ export interface CreateShopInput {
 interface UploadShopPanelProps {
   onCreateShop?: (input: CreateShopInput) => Promise<Shop | null>;
   selectedCoords?: { lat: number; lng: number } | null;
+  onAutoLocate?: (coords: { lat: number; lng: number }) => void;
 }
 
 const DEFAULT_LAT = 34.2044;
 const DEFAULT_LNG = 117.28565;
 
-export function UploadShopPanel({ onCreateShop, selectedCoords }: UploadShopPanelProps) {
+export function UploadShopPanel({
+  onCreateShop,
+  selectedCoords,
+  onAutoLocate,
+}: UploadShopPanelProps) {
   const [form, setForm] = useState<CreateShopInput>({
     name: "",
     address: "",
@@ -33,6 +40,7 @@ export function UploadShopPanel({ onCreateShop, selectedCoords }: UploadShopPane
     lng: DEFAULT_LNG,
   });
   const [submitting, setSubmitting] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [feedback, setFeedback] = useState<string>("");
 
   useEffect(() => {
@@ -52,6 +60,38 @@ export function UploadShopPanel({ onCreateShop, selectedCoords }: UploadShopPane
         form.creator_name.trim(),
     );
   }, [form]);
+
+  async function handleAutoLocate() {
+    if (!form.address.trim()) {
+      setFeedback("先填地址，我再帮你自动定位。");
+      return;
+    }
+
+    if (!hasAmapEnv) {
+      setFeedback("还没配置高德 Key，暂时不能自动定位。先点地图选点，或把 NEXT_PUBLIC_AMAP_KEY 配到 Vercel。 ");
+      return;
+    }
+
+    setLocating(true);
+    setFeedback("正在根据地址自动定位...");
+
+    try {
+      const result = await geocodeAddress(form.address.trim());
+      setForm((current) => ({
+        ...current,
+        address: result.formattedAddress,
+        lat: Number(result.lat.toFixed(6)),
+        lng: Number(result.lng.toFixed(6)),
+      }));
+      onAutoLocate?.({ lat: result.lat, lng: result.lng });
+      setFeedback("定位到了，地图已经跳过去了。如果位置有点偏，再点地图微调一下。");
+    } catch (error) {
+      console.error("[shops] geocode failed", error);
+      setFeedback("自动定位没命中。你可以把地址写得更完整一点，或者直接点左侧地图选点。");
+    } finally {
+      setLocating(false);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -100,7 +140,7 @@ export function UploadShopPanel({ onCreateShop, selectedCoords }: UploadShopPane
         <p className={styles.eyebrow}>上传一家店</p>
         <h2>先把数据闭环跑起来</h2>
         <p className={styles.desc}>
-          现在已经可以直接在左侧地图上点击选点，先把店铺位置定准，再补图片上传和地址解析。
+          现在可以先输地址自动定位，再用左侧地图微调坐标。这样上传更快，也不用让用户自己找经纬度。
         </p>
       </div>
 
@@ -116,11 +156,21 @@ export function UploadShopPanel({ onCreateShop, selectedCoords }: UploadShopPane
 
         <label className={styles.field}>
           <span>地址</span>
-          <input
-            value={form.address}
-            onChange={(event) => updateField("address", event.target.value)}
-            placeholder="尽量写详细一点，后面好补坐标"
-          />
+          <div className={styles.addressRow}>
+            <input
+              value={form.address}
+              onChange={(event) => updateField("address", event.target.value)}
+              placeholder="尽量写详细一点，比如区 + 路名 + 门牌号"
+            />
+            <button
+              type="button"
+              className={styles.locateButton}
+              onClick={handleAutoLocate}
+              disabled={locating}
+            >
+              {locating ? "定位中..." : "自动定位"}
+            </button>
+          </div>
         </label>
 
         <label className={styles.field}>
@@ -175,14 +225,14 @@ export function UploadShopPanel({ onCreateShop, selectedCoords }: UploadShopPane
 
         <div className={styles.tips}>
           <span>默认坐标是徐州市中心</span>
-          <span>点左侧地图可自动带入坐标</span>
+          <span>高德负责地址解析，左侧地图负责微调</span>
           <span>{selectedCoords ? `当前选点：${selectedCoords.lat.toFixed(5)}, ${selectedCoords.lng.toFixed(5)}` : "还没选点时也能先手填坐标"}</span>
         </div>
 
         <button
           type="submit"
           className={styles.button}
-          disabled={!isValid || submitting || !onCreateShop}
+          disabled={!isValid || submitting || locating || !onCreateShop}
         >
           {submitting ? "上传中..." : "上传一家店"}
         </button>

@@ -158,7 +158,11 @@ export default function Home() {
           </div>
         </div>
 
-        <UploadShopPanel onCreateShop={handleCreateShop} selectedCoords={pickerCoords} />
+        <UploadShopPanel
+          onCreateShop={handleCreateShop}
+          selectedCoords={pickerCoords}
+          onAutoLocate={(coords) => setPickerCoords(coords)}
+        />
       </section>
     </main>
   );
