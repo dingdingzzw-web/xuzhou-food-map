@@ -139,7 +139,7 @@
 }
 
 .mapColumn::after {
-  content: "自定义徐州底图";
+  content: "街道级可缩放地图";
   position: absolute;
   top: 18px;
   left: 18px;

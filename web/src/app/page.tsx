@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CustomMap } from "@/components/map/custom-map";
+import { ZoomableMap } from "@/components/map/zoomable-map";
 import { ShopDetailDrawer } from "@/components/shops/shop-detail-drawer";
 import { ShopCard } from "@/components/shops/shop-card";
 import { UploadShopPanel } from "@/components/shops/upload-shop-panel";
@@ -119,7 +119,7 @@ export default function Home() {
 
       <section className={styles.mainGrid}>
         <div className={styles.mapColumn}>
-          <CustomMap
+          <ZoomableMap
             shops={filteredShops}
             activeShopId={activeShop?.id}
             onSelectShop={(shop) => setActiveShopId(shop.id)}

@@ -1,0 +1,101 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f8f2e8 0%, #f5ecde 100%);
+  border: 1px solid rgba(82, 49, 29, 0.08);
+  box-shadow: 0 30px 80px rgba(88, 60, 34, 0.12);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 0;
+}
+
+.header strong {
+  display: block;
+  color: #583725;
+  font-size: 18px;
+}
+
+.header p {
+  margin-top: 6px;
+  color: #7a5c44;
+  font-size: 13px;
+}
+
+.badge {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.92);
+  color: #9b653a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.map {
+  min-height: 620px;
+}
+
+.map :global(.maplibregl-canvas) {
+  border-radius: 24px;
+}
+
+.map :global(.maplibregl-ctrl-top-right),
+.map :global(.maplibregl-ctrl-bottom-left) {
+  z-index: 2;
+}
+
+.marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(214, 111, 45, 0.92);
+  color: #fffaf5;
+  box-shadow: 0 12px 24px rgba(91, 52, 24, 0.22);
+  cursor: pointer;
+  transform: translateY(0);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.marker:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(91, 52, 24, 0.28);
+}
+
+.markerActive {
+  background: #a9471a;
+}
+
+.markerEmoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.markerLabel {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .map {
+    min-height: 520px;
+  }
+}
