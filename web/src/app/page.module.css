@@ -93,10 +93,39 @@
   cursor: pointer;
 }
 
-.mainGrid {
+.mapSection,
+.listBlock {
+  border-radius: 28px;
+  border: 1px solid rgba(104, 64, 34, 0.08);
+  background: rgba(255, 251, 245, 0.82);
+  box-shadow: 0 24px 60px rgba(102, 68, 40, 0.08);
+}
+
+.mapSection {
+  padding: 22px;
+}
+
+.mapHeader,
+.blockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.mapHeader h2,
+.blockHeader h2 {
+  margin-top: 12px;
+  color: #4f2f1e;
+  font-size: 28px;
+}
+
+.contentGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) 420px;
+  grid-template-columns: minmax(0, 1.2fr) 420px;
   gap: 24px;
+  margin-top: 24px;
 }
 
 .mapColumn,
@@ -109,7 +138,7 @@
 }
 
 .mapColumn::after {
-  content: "街道级可缩放地图";
+  content: "已标注饭店点位";
   position: absolute;
   top: 18px;
   left: 18px;
@@ -123,29 +152,8 @@
   box-shadow: 0 12px 24px rgba(80, 53, 31, 0.08);
 }
 
-.bottomGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) 420px;
-  gap: 24px;
-  margin-top: 24px;
-}
-
 .listBlock {
   padding: 22px;
-}
-
-.blockHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.blockHeader h2 {
-  margin-top: 12px;
-  color: #4f2f1e;
-  font-size: 28px;
 }
 
 .count {
@@ -191,13 +199,8 @@
 }
 
 @media (max-width: 1200px) {
-  .mainGrid,
-  .bottomGrid {
+  .contentGrid {
     grid-template-columns: 1fr;
-  }
-
-  .sideColumn {
-    order: -1;
   }
 }
 

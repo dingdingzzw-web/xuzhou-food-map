@@ -31,7 +31,7 @@ export function ShopCard({ shop, active, onClick }: ShopCardProps) {
         <p className={styles.address}>{shop.address}</p>
         <p className={styles.reason}>{shop.reason}</p>
         <div className={styles.footer}>
-          <span>上传者：{shop.creator_name}</span>
+          <span className={styles.uploader}>上传者：{shop.creator_name}</span>
           <div className={styles.votes}>
             <span>好次 {shop.good_count}</span>
             <span>包次 {shop.bad_count}</span>

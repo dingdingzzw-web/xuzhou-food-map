@@ -90,8 +90,8 @@ export function AMapView({
         offset: new AMap.Pixel(-14, -28),
         label: {
           direction: "top",
-          offset: new AMap.Pixel(0, -6),
-          content: `<div style="padding:4px 8px;border-radius:999px;background:${shop.id === activeShopId ? "#ffedd7" : "rgba(255,251,245,0.95)"};border:1px solid rgba(157,98,56,0.18);color:#5c3923;font-size:12px;font-weight:600;box-shadow:0 8px 16px rgba(0,0,0,0.08);">🍜 ${shop.name}</div>`,
+          offset: new AMap.Pixel(0, -8),
+          content: `<div style="max-width:160px;padding:5px 10px;border-radius:999px;background:${shop.id === activeShopId ? "#ffedd7" : "rgba(255,251,245,0.96)"};border:1px solid rgba(157,98,56,0.18);color:#5c3923;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 16px rgba(0,0,0,0.08);">${shop.name}</div>`,
         },
       });
 

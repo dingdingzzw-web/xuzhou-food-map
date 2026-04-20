@@ -135,7 +135,17 @@ export default function Home() {
         </button>
       </section>
 
-      <section className={styles.mainGrid}>
+      <section className={styles.mapSection}>
+        <div className={styles.mapHeader}>
+          <div>
+            <span className={styles.kicker}>地图优先</span>
+            <h2>先看地图上的店</h2>
+          </div>
+          <span className={styles.count}>
+            {isLoading ? "加载中..." : `${filteredShops.length} 家`}
+          </span>
+        </div>
+
         <div className={styles.mapColumn}>
           {mapMode === "amap" ? (
             <AMapView
@@ -153,29 +163,15 @@ export default function Home() {
             />
           )}
         </div>
-
-        <div className={styles.sideColumn}>
-          {activeShop ? (
-            <ShopDetailDrawer
-              shop={activeShop}
-              onVote={handleVote}
-              onAddImage={handleAddImage}
-              onUpdateDetails={handleUpdateDetails}
-            />
-          ) : null}
-        </div>
       </section>
 
-      <section className={styles.bottomGrid}>
+      <section className={styles.contentGrid}>
         <div className={styles.listBlock}>
           <div className={styles.blockHeader}>
             <div>
-              <span className={styles.kicker}>当前点位</span>
-              <h2>先从这几家开始</h2>
+              <span className={styles.kicker}>饭店列表</span>
+              <h2>按列表继续看</h2>
             </div>
-            <span className={styles.count}>
-              {isLoading ? "加载中..." : `${filteredShops.length} 家`}
-            </span>
           </div>
 
           {loadError ? <p className={styles.loadError}>{loadError}</p> : null}
@@ -199,18 +195,29 @@ export default function Home() {
           </div>
         </div>
 
-        <section ref={uploadPanelRef}>
-          <UploadShopPanel
-            onCreateShop={handleCreateShop}
-            selectedCoords={pickerCoords}
-            pickerEnabled={pickerEnabled}
-            onAutoLocate={(coords) => {
-              setPickerCoords(coords);
-              setPickerEnabled(true);
-            }}
-            onTogglePicker={() => setPickerEnabled((current) => !current)}
-          />
-        </section>
+        <div className={styles.sideColumn}>
+          {activeShop ? (
+            <ShopDetailDrawer
+              shop={activeShop}
+              onVote={handleVote}
+              onAddImage={handleAddImage}
+              onUpdateDetails={handleUpdateDetails}
+            />
+          ) : null}
+
+          <section ref={uploadPanelRef}>
+            <UploadShopPanel
+              onCreateShop={handleCreateShop}
+              selectedCoords={pickerCoords}
+              pickerEnabled={pickerEnabled}
+              onAutoLocate={(coords) => {
+                setPickerCoords(coords);
+                setPickerEnabled(true);
+              }}
+              onTogglePicker={() => setPickerEnabled((current) => !current)}
+            />
+          </section>
+        </div>
       </section>
     </main>
   );
