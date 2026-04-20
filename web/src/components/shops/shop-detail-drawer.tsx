@@ -5,6 +5,7 @@ import {
   buildBaiduMapUrl,
   buildTencentMapUrl,
 } from "@/lib/navigation";
+import { hasShopCover, ShopCoverPlaceholder } from "@/lib/shop-cover";
 import styles from "./shop-detail-drawer.module.css";
 
 interface ShopDetailDrawerProps {
@@ -15,8 +16,12 @@ export function ShopDetailDrawer({ shop }: ShopDetailDrawerProps) {
   return (
     <aside className={styles.drawer}>
       <div className={styles.coverWrap}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className={styles.cover} src={shop.cover_image_url} alt={shop.name} />
+        {hasShopCover(shop) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className={styles.cover} src={shop.cover_image_url!} alt={shop.name} />
+        ) : (
+          <ShopCoverPlaceholder />
+        )}
       </div>
 
       <div className={styles.header}>
@@ -44,6 +49,13 @@ export function ShopDetailDrawer({ shop }: ShopDetailDrawerProps) {
         <h3>上传者</h3>
         <p>{shop.creator_name}</p>
       </div>
+
+      {!hasShopCover(shop) ? (
+        <div className={styles.noticeBlock}>
+          <h3>当前状态</h3>
+          <p>这家店的位置和基础信息已经收录，但图片还没补齐。后续任何人都可以继续补图，慢慢把内容做完整。</p>
+        </div>
+      ) : null}
 
       <div className={styles.actions}>
         <button type="button" className={styles.primary}>

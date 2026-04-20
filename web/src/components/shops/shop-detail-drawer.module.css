@@ -72,6 +72,27 @@
   line-height: 1.6;
 }
 
+.noticeBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #fff3e2;
+  border: 1px dashed rgba(176, 106, 55, 0.24);
+}
+
+.noticeBlock h3 {
+  color: #8e572f;
+  font-size: 14px;
+}
+
+.noticeBlock p {
+  color: #7a593e;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;

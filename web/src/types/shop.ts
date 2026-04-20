@@ -6,7 +6,7 @@ export interface Shop {
   address: string;
   lat: number;
   lng: number;
-  cover_image_url: string;
+  cover_image_url?: string | null;
   reason: string;
   creator_name: string;
   good_count: number;

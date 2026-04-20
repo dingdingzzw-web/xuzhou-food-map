@@ -1,4 +1,5 @@
 import type { Shop } from "@/types/shop";
+import { hasShopCover, ShopCoverPlaceholder } from "@/lib/shop-cover";
 import styles from "./shop-card.module.css";
 
 interface ShopCardProps {
@@ -15,13 +16,17 @@ export function ShopCard({ shop, active, onClick }: ShopCardProps) {
       onClick={onClick}
     >
       <div className={styles.coverWrap}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className={styles.cover} src={shop.cover_image_url} alt={shop.name} />
+        {hasShopCover(shop) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className={styles.cover} src={shop.cover_image_url!} alt={shop.name} />
+        ) : (
+          <ShopCoverPlaceholder compact />
+        )}
       </div>
       <div className={styles.content}>
         <div className={styles.titleRow}>
           <h3>{shop.name}</h3>
-          <span className={styles.badge}>本地推荐</span>
+          <span className={styles.badge}>{hasShopCover(shop) ? "本地推荐" : "待补图片"}</span>
         </div>
         <p className={styles.address}>{shop.address}</p>
         <p className={styles.reason}>{shop.reason}</p>

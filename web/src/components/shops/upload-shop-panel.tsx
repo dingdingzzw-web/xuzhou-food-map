@@ -108,9 +108,7 @@ export function UploadShopPanel({
     try {
       const created = await onCreateShop({
         ...form,
-        cover_image_url:
-          form.cover_image_url.trim() ||
-          "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+        cover_image_url: form.cover_image_url.trim(),
       });
 
       if (created) {
@@ -187,7 +185,7 @@ export function UploadShopPanel({
           <input
             value={form.cover_image_url}
             onChange={(event) => updateField("cover_image_url", event.target.value)}
-            placeholder="先支持 URL，后面再接真实图片上传"
+            placeholder="可先不传，后续再由其他人补图"
           />
         </label>
 
