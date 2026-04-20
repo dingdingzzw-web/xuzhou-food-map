@@ -51,12 +51,6 @@ export function AMapView({
           viewMode: "2D",
         });
 
-        new window.AMap.Marker({
-          map: mapRef.current,
-          position: XUZHOU_CENTER,
-          title: "徐州中心测试点",
-        });
-
         setMessage("高德地图已接入");
       } catch (error) {
         console.error("[amap] init failed", error);
@@ -81,6 +75,7 @@ export function AMapView({
 
     const center = [pickerPosition.lng, pickerPosition.lat] as [number, number];
     mapRef.current.setZoomAndCenter?.(15, center);
+    setMessage("地图已定位到新上传店铺");
   }, [pickerPosition]);
 
   useEffect(() => {
@@ -112,6 +107,15 @@ export function AMapView({
     });
 
     markersRef.current = nextMarkers;
+
+    if (activeShopId) {
+      const activeShop = shopsWithCoords.find((shop) => shop.id === activeShopId);
+      if (activeShop) {
+        mapRef.current.setZoomAndCenter?.(15, [Number(activeShop.lng), Number(activeShop.lat)]);
+        setMessage(`地图已定位到 ${activeShop.name}`);
+        return;
+      }
+    }
 
     if (nextMarkers.length === 1) {
       const onlyShop = shopsWithCoords[0];
