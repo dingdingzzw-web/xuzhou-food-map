@@ -90,15 +90,12 @@ export function AMapView({
     markersRef.current = [];
 
     const nextMarkers = shopsWithCoords.map((shop) => {
+      const isActive = shop.id === activeShopId;
       const marker = new AMap.Marker({
         position: [shop.lng, shop.lat],
         title: shop.name,
-        offset: new AMap.Pixel(-14, -28),
-        label: {
-          direction: "top",
-          offset: new AMap.Pixel(0, -8),
-          content: `<div style="max-width:160px;padding:5px 10px;border-radius:999px;background:${shop.id === activeShopId ? "#ffedd7" : "rgba(255,251,245,0.96)"};border:1px solid rgba(157,98,56,0.18);color:#5c3923;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 16px rgba(0,0,0,0.08);">${shop.name}</div>`,
-        },
+        offset: new AMap.Pixel(-10, -10),
+        content: `<div style="display:flex;align-items:center;justify-content:center;width:${isActive ? 22 : 18}px;height:${isActive ? 22 : 18}px;border-radius:999px;background:${isActive ? "#b2451d" : "#d66f2d"};border:3px solid #fff6ec;box-shadow:0 6px 16px rgba(0,0,0,0.18);"></div>`,
       });
 
       marker.on?.("click", () => onSelectShop?.(shop));
@@ -120,10 +117,7 @@ export function AMapView({
       setMessage(`地图已标注 ${nextMarkers.length} 家店`);
     }
 
-    const activeMarker = nextMarkers.find((_, index) => shopsWithCoords[index]?.id === activeShopId);
-    if (activeMarker) {
-      mapRef.current.setFitView?.([activeMarker]);
-    } else {
+    if (!nextMarkers.length) {
       setMessage("当前店铺还没有可展示的定位点");
     }
   }, [shops, activeShopId, onSelectShop]);
