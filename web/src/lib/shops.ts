@@ -141,7 +141,7 @@ export async function updateShopCover(shopId: string, imageUrl: string): Promise
   return data as Shop;
 }
 
-export async function updateShopDetails(shopId: string, input: ShopUpdateInput): Promise<Shop> {
+export async function updateShopDetails(shopId: string, input: ShopUpdateInput): Promise<void> {
   const client = await ensureAnonymousSession();
 
   if (!client) {
@@ -199,27 +199,15 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
     throw new Error("empty_shop_update");
   }
 
-  const { data, error } = await client
+  const { error } = await client
     .from("shops")
     .update(payload)
-    .eq("id", normalizedShopId)
-    .select(SHOP_SELECT)
-    .maybeSingle();
+    .eq("id", normalizedShopId);
 
   if (error) {
     console.error("[shops] update failed", error);
     throw new Error(error.message || "update_shop_failed");
   }
-
-  if (!data) {
-    throw new Error(`shop_not_found_or_not_updatable:${normalizedShopId}`);
-  }
-
-  return {
-    ...data,
-    lat: data.lat == null ? null : Number(data.lat),
-    lng: data.lng == null ? null : Number(data.lng),
-  } as Shop;
 }
 
 export async function deleteShop(shopId: string): Promise<void> {

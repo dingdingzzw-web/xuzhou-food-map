@@ -98,7 +98,7 @@ export default function ManagePage() {
     setFeedback("");
 
     try {
-      const updated = await updateShopDetails(activeShop.id, {
+      await updateShopDetails(activeShop.id, {
         name: form.name,
         address: form.address,
         reason: form.reason,
@@ -109,7 +109,14 @@ export default function ManagePage() {
         status: form.status as "active" | "hidden" | "pending",
       });
 
-      setShops((current) => current.map((shop) => (shop.id === updated.id ? updated : shop)));
+      const client = await ensureAnonymousSession();
+      if (!client) throw new Error("missing_supabase_env");
+      const { data, error } = await client
+        .from("shops")
+        .select("id, name, address, lat, lng, cover_image_url, reason, creator_name, alias, status, good_count, bad_count, created_at, updated_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setShops((data ?? []) as Shop[]);
       setFeedback("店铺信息已更新。这个页面先只给你自己用，适合纠正脏数据。");
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown_manage_save_error";
@@ -245,8 +252,15 @@ export default function ManagePage() {
                     if (!activeShop) return;
                     setSaving(true);
                     try {
-                      const updated = await updateShopDetails(activeShop.id, { status: "hidden" });
-                      setShops((current) => current.map((shop) => (shop.id === updated.id ? updated : shop)));
+                      await updateShopDetails(activeShop.id, { status: "hidden" });
+                      const client = await ensureAnonymousSession();
+                      if (!client) throw new Error("missing_supabase_env");
+                      const { data, error } = await client
+                        .from("shops")
+                        .select("id, name, address, lat, lng, cover_image_url, reason, creator_name, alias, status, good_count, bad_count, created_at, updated_at")
+                        .order("created_at", { ascending: false });
+                      if (error) throw error;
+                      setShops((data ?? []) as Shop[]);
                       setFeedback("已隐藏这条店铺，前台不会再展示。");
                     } catch (error) {
                       const message = error instanceof Error ? error.message : "unknown_hide_error";

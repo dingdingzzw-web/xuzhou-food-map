@@ -100,11 +100,10 @@ export default function Home() {
     shopId: string,
     input: { address?: string; reason?: string; alias?: string },
   ) {
-    const updated = await updateShopDetails(shopId, input);
-
-    setShops((current) =>
-      current.map((shop) => (shop.id === shopId ? updated : shop)),
-    );
+    await updateShopDetails(shopId, input);
+    const result = await fetchShops();
+    setShops(result.shops);
+    setDataSource(result.source);
   }
 
   return (
