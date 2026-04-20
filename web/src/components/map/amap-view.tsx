@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { env } from "@/lib/env";
 import { loadAmapSdk } from "@/lib/amap";
 import type { Shop } from "@/types/shop";
 import styles from "./amap-view.module.css";
@@ -26,7 +27,9 @@ export function AMapView({
   const mapRef = useRef<{
     destroy?: () => void;
     add?: (overlays: unknown[]) => void;
-    setFitView?: () => void;
+    setFitView?: (overlays?: unknown[]) => void;
+    clearMap?: () => void;
+    setZoomAndCenter?: (zoom: number, center: [number, number]) => void;
   } | null>(null);
   const [message, setMessage] = useState("正在接入徐州地图...");
 
@@ -70,8 +73,7 @@ export function AMapView({
     if (!window.AMap || !mapRef.current || !pickerPosition) return;
 
     const center = [pickerPosition.lng, pickerPosition.lat] as [number, number];
-    const anyMap = mapRef.current as { setZoomAndCenter?: (zoom: number, center: [number, number]) => void };
-    anyMap.setZoomAndCenter?.(15, center);
+    mapRef.current.setZoomAndCenter?.(15, center);
   }, [pickerPosition]);
 
   useEffect(() => {
@@ -82,6 +84,8 @@ export function AMapView({
       (shop): shop is Shop & { lat: number; lng: number } =>
         typeof shop.lat === "number" && typeof shop.lng === "number",
     );
+
+    mapRef.current.clearMap?.();
 
     const nextMarkers = shopsWithCoords.map((shop) => {
       const marker = new AMap.Marker({
@@ -99,14 +103,33 @@ export function AMapView({
       return marker;
     });
 
-    mapRef.current.add?.(nextMarkers);
-    mapRef.current.setFitView?.();
+    if (nextMarkers.length === 1) {
+      const onlyShop = shopsWithCoords[0];
+      if (onlyShop) {
+        mapRef.current.add?.(nextMarkers);
+        mapRef.current.setZoomAndCenter?.(15, [onlyShop.lng, onlyShop.lat]);
+        setMessage(`地图已定位到 ${onlyShop.name}`);
+      }
+    } else if (nextMarkers.length > 1) {
+      mapRef.current.add?.(nextMarkers);
+      mapRef.current.setFitView?.(nextMarkers);
+      setMessage(`地图已标注 ${nextMarkers.length} 家店`);
+    } else {
+      setMessage("当前店铺还没有可展示的定位点");
+    }
   }, [shops, activeShopId, onSelectShop]);
+
+  const isInvalidUserKey = env.amapKey === "";
 
   return (
     <div className={styles.wrap}>
       <div ref={containerRef} className={styles.map} />
       <div className={styles.badge}>{message}</div>
+      {isInvalidUserKey ? (
+        <div className={styles.warning}>
+          当前高德 Key 不可用，自动定位会失败。先直接提交地址，后面再修 Key。
+        </div>
+      ) : null}
     </div>
   );
 }

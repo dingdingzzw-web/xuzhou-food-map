@@ -27,10 +27,33 @@
   box-shadow: 0 12px 32px rgba(83, 54, 31, 0.08);
 }
 
+.warning {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2;
+  max-width: 360px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 241, 221, 0.96);
+  border: 1px solid rgba(214, 111, 45, 0.18);
+  color: #8c542e;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 12px 32px rgba(83, 54, 31, 0.08);
+}
+
 @media (max-width: 900px) {
   .wrap,
   .map {
     min-height: 420px;
     height: 420px;
+  }
+
+  .warning {
+    left: 20px;
+    right: 20px;
+    bottom: 84px;
+    max-width: none;
   }
 }
