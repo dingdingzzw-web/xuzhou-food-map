@@ -8,6 +8,7 @@ import styles from "./amap-view.module.css";
 interface AMapViewProps {
   shops: Shop[];
   activeShopId?: string;
+  pickerPosition?: { lat: number; lng: number } | null;
   onSelectShop?: (shop: Shop) => void;
   onMapError?: () => void;
 }
@@ -17,6 +18,7 @@ const XUZHOU_CENTER: [number, number] = [117.28565, 34.2044];
 export function AMapView({
   shops,
   activeShopId,
+  pickerPosition,
   onSelectShop,
   onMapError,
 }: AMapViewProps) {
@@ -65,10 +67,23 @@ export function AMapView({
   }, [onMapError]);
 
   useEffect(() => {
+    if (!window.AMap || !mapRef.current || !pickerPosition) return;
+
+    const center = [pickerPosition.lng, pickerPosition.lat] as [number, number];
+    const anyMap = mapRef.current as { setZoomAndCenter?: (zoom: number, center: [number, number]) => void };
+    anyMap.setZoomAndCenter?.(15, center);
+  }, [pickerPosition]);
+
+  useEffect(() => {
     if (!window.AMap || !mapRef.current) return;
 
     const AMap = window.AMap;
-    const nextMarkers = shops.map((shop) => {
+    const shopsWithCoords = shops.filter(
+      (shop): shop is Shop & { lat: number; lng: number } =>
+        typeof shop.lat === "number" && typeof shop.lng === "number",
+    );
+
+    const nextMarkers = shopsWithCoords.map((shop) => {
       const marker = new AMap.Marker({
         position: [shop.lng, shop.lat],
         title: shop.name,

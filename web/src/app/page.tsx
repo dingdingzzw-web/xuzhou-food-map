@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AMapView } from "@/components/map/amap-view";
 import { CustomMap } from "@/components/map/custom-map";
 import { ShopDetailDrawer } from "@/components/shops/shop-detail-drawer";
 import { ShopCard } from "@/components/shops/shop-card";
@@ -18,6 +19,7 @@ export default function Home() {
   const [loadError, setLoadError] = useState("");
   const [pickerCoords, setPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [pickerEnabled, setPickerEnabled] = useState(false);
+  const [mapMode, setMapMode] = useState<"amap" | "custom">("amap");
   const uploadPanelRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -137,11 +139,21 @@ export default function Home() {
 
       <section className={styles.mainGrid}>
         <div className={styles.mapColumn}>
-          <CustomMap
-            shops={filteredShops}
-            activeShopId={activeShop?.id}
-            onSelectShop={(shop) => setActiveShopId(shop.id)}
-          />
+          {mapMode === "amap" ? (
+            <AMapView
+              shops={filteredShops}
+              activeShopId={activeShop?.id}
+              pickerPosition={pickerCoords}
+              onSelectShop={(shop) => setActiveShopId(shop.id)}
+              onMapError={() => setMapMode("custom")}
+            />
+          ) : (
+            <CustomMap
+              shops={filteredShops}
+              activeShopId={activeShop?.id}
+              onSelectShop={(shop) => setActiveShopId(shop.id)}
+            />
+          )}
         </div>
 
         <div className={styles.sideColumn}>
