@@ -45,7 +45,11 @@ export async function fetchShops(): Promise<{
   }
 
   return {
-    shops: (data ?? []) as Shop[],
+    shops: (data ?? []).map((shop) => ({
+      ...shop,
+      lat: shop.lat == null ? null : Number(shop.lat),
+      lng: shop.lng == null ? null : Number(shop.lng),
+    })) as Shop[],
     source: "supabase",
   };
 }
@@ -79,7 +83,11 @@ export async function createShop(input: CreateShopInput): Promise<Shop> {
     throw new Error(error.message || "create_shop_failed");
   }
 
-  return data as Shop;
+  return {
+    ...data,
+    lat: data.lat == null ? null : Number(data.lat),
+    lng: data.lng == null ? null : Number(data.lng),
+  } as Shop;
 }
 
 export async function addShopImage(input: {
@@ -207,7 +215,11 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
     throw new Error(`shop_not_found_or_not_updatable:${normalizedShopId}`);
   }
 
-  return data as Shop;
+  return {
+    ...data,
+    lat: data.lat == null ? null : Number(data.lat),
+    lng: data.lng == null ? null : Number(data.lng),
+  } as Shop;
 }
 
 export async function deleteShop(shopId: string): Promise<void> {

@@ -88,10 +88,11 @@ export function AMapView({
     if (!window.AMap || !mapRef.current) return;
 
     const AMap = window.AMap;
-    const shopsWithCoords = shops.filter(
-      (shop): shop is Shop & { lat: number; lng: number } =>
-        typeof shop.lat === "number" && typeof shop.lng === "number",
-    );
+    const shopsWithCoords = shops.filter((shop): shop is Shop & { lat: number; lng: number } => {
+      const lat = Number(shop.lat);
+      const lng = Number(shop.lng);
+      return Number.isFinite(lat) && Number.isFinite(lng);
+    });
 
     mapRef.current.clearMap?.();
     markersRef.current = [];
