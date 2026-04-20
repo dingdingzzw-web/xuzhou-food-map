@@ -187,7 +187,12 @@ export function CustomMap({ shops, activeShopId, onSelectShop }: CustomMapProps)
       };
     });
 
-    const markers = shops.map((shop) => ({
+    const shopsWithCoords = shops.filter(
+      (shop): shop is Shop & { lat: number; lng: number } =>
+        typeof shop.lat === "number" && typeof shop.lng === "number",
+    );
+
+    const markers = shopsWithCoords.map((shop) => ({
       shop,
       point: toSvgPoint(shop.lng, shop.lat, bounds),
     }));

@@ -4,8 +4,8 @@ export interface Shop {
   id: string;
   name: string;
   address: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   cover_image_url?: string | null;
   reason: string;
   creator_name: string;

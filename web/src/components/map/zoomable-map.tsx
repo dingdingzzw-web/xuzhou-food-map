@@ -35,9 +35,18 @@ export function ZoomableMap({
   const markersRef = useRef<Marker[]>([]);
   const pickerMarkerRef = useRef<Marker | null>(null);
 
+  const shopsWithCoords = useMemo(
+    () =>
+      shops.filter(
+        (shop): shop is Shop & { lat: number; lng: number } =>
+          typeof shop.lat === "number" && typeof shop.lng === "number",
+      ),
+    [shops],
+  );
+
   const activeShop = useMemo(
-    () => shops.find((shop) => shop.id === activeShopId) ?? shops[0],
-    [activeShopId, shops],
+    () => shopsWithCoords.find((shop) => shop.id === activeShopId) ?? shopsWithCoords[0],
+    [activeShopId, shopsWithCoords],
   );
 
   useEffect(() => {
@@ -79,7 +88,7 @@ export function ZoomableMap({
 
     markersRef.current.forEach((marker) => marker.remove());
 
-    markersRef.current = shops.map((shop) => {
+    markersRef.current = shopsWithCoords.map((shop) => {
       const el = document.createElement("button");
       el.type = "button";
       el.className = shop.id === activeShopId ? `${styles.marker} ${styles.markerActive}` : styles.marker;
@@ -90,7 +99,7 @@ export function ZoomableMap({
         .setLngLat([shop.lng, shop.lat])
         .addTo(map);
     });
-  }, [activeShopId, onSelectShop, shops]);
+  }, [activeShopId, onSelectShop, shopsWithCoords]);
 
   useEffect(() => {
     const map = mapRef.current;
