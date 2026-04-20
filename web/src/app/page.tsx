@@ -36,9 +36,10 @@ export default function Home() {
       } catch (error) {
         console.error("[shops] load failed", error);
         if (!cancelled) {
+          const message = error instanceof Error ? error.message : "unknown_fetch_error";
           setShops([]);
           setDataSource("supabase");
-          setLoadError("当前没读到线上店铺数据，请先检查 Supabase 读权限或环境变量。");
+          setLoadError(`读取线上店铺失败：${message}`);
         }
       } finally {
         if (!cancelled) {
@@ -182,7 +183,7 @@ export default function Home() {
           {!isLoading && !filteredShops.length ? (
             <div className={styles.emptyState}>
               <p>还没有读取到店铺数据。</p>
-              <span>如果你刚上传过店铺但这里是空的，通常是 Supabase 读取权限或环境变量还没完全配通。</span>
+              <span>现在页面会直接显示真实报错。把那句错误原文发我，我就能继续定点修。</span>
             </div>
           ) : null}
 
