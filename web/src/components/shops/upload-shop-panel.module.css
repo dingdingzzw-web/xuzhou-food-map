@@ -20,12 +20,6 @@
   color: #512f1d;
 }
 
-.desc {
-  margin-top: 10px;
-  color: #755843;
-  line-height: 1.6;
-}
-
 .form {
   display: flex;
   flex-direction: column;
@@ -82,12 +76,6 @@
   cursor: wait;
 }
 
-.coordRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
 .tips {
   display: flex;
   flex-wrap: wrap;
@@ -136,8 +124,7 @@
 }
 
 @media (max-width: 640px) {
-  .addressRow,
-  .coordRow {
+  .addressRow {
     grid-template-columns: 1fr;
   }
 

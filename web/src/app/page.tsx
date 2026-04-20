@@ -113,9 +113,7 @@ export default function Home() {
         <div className={styles.heroText}>
           <span className={styles.kicker}>徐州本地共建地图</span>
           <h1>徐州美食地图</h1>
-          <p>
-            第一版先把点位、补图、好次 / 包次跑通。主地图走徐州自定义底图，站内负责种草，导航交给外部地图 App。
-          </p>
+          <p>先把大家推荐的店收进来。</p>
         </div>
       </section>
 

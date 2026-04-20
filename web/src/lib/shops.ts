@@ -36,7 +36,7 @@ export async function fetchShops(): Promise<{
   const { data, error } = await client
     .from("shops")
     .select(SHOP_SELECT)
-    .eq("status", "active")
+    .in("status", ["active", "approved"])
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -65,6 +65,7 @@ export async function createShop(input: CreateShopInput): Promise<Shop> {
     creator_name: input.creator_name.trim(),
     lat: input.lat,
     lng: input.lng,
+    status: "approved",
   };
 
   const { data, error } = await client

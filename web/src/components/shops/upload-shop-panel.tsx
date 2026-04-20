@@ -12,8 +12,8 @@ export interface CreateShopInput {
   cover_image_url: string;
   reason: string;
   creator_name: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
 }
 
 interface UploadShopPanelProps {
@@ -40,8 +40,8 @@ export function UploadShopPanel({
     cover_image_url: "",
     reason: "",
     creator_name: "",
-    lat: DEFAULT_LAT,
-    lng: DEFAULT_LNG,
+    lat: null,
+    lng: null,
   });
   const [submitting, setSubmitting] = useState(false);
   const [locating, setLocating] = useState(false);
@@ -72,7 +72,7 @@ export function UploadShopPanel({
     }
 
     if (!hasAmapEnv) {
-      setFeedback("还没配置高德 Key，暂时不能自动定位。先开启选点模式手动定位置，或把 NEXT_PUBLIC_AMAP_KEY 配到 Vercel。");
+      setFeedback("还没配置高德 Key，暂时不能自动定位。先直接提交地址，后面再补定位。");
       return;
     }
 
@@ -88,11 +88,11 @@ export function UploadShopPanel({
         lng: Number(result.lng.toFixed(6)),
       }));
       onAutoLocate?.({ lat: result.lat, lng: result.lng });
-      setFeedback("定位到了，地图已经跳过去了。如果位置有点偏，再点地图微调一下。");
+      setFeedback("定位到了，地图已经跳过去了。");
     } catch (error) {
       console.error("[shops] geocode failed", error);
       const message = error instanceof Error ? error.message : "unknown_geocode_error";
-      setFeedback(`自动定位没命中（${message}）。你可以把地址写得更完整一点，或者开启选点模式手动定位置。`);
+      setFeedback(`自动定位失败（${message}），你可以先直接提交地址。`);
     } finally {
       setLocating(false);
     }
@@ -119,8 +119,8 @@ export function UploadShopPanel({
           cover_image_url: "",
           reason: "",
           creator_name: "",
-          lat: DEFAULT_LAT,
-          lng: DEFAULT_LNG,
+          lat: null,
+          lng: null,
         });
       }
     } catch (error) {
@@ -145,10 +145,7 @@ export function UploadShopPanel({
     <section className={styles.panel}>
       <div>
         <p className={styles.eyebrow}>上传一家店</p>
-        <h2>先把数据闭环跑起来</h2>
-        <p className={styles.desc}>
-          现在可以先输地址自动定位，再按需开启地图选点模式微调坐标。这样上传更快，也不会一碰地图就误选。
-        </p>
+        <h2>先上传店名和地址</h2>
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -167,7 +164,7 @@ export function UploadShopPanel({
             <input
               value={form.address}
               onChange={(event) => updateField("address", event.target.value)}
-              placeholder="尽量写详细一点，比如区 + 路名 + 门牌号"
+              placeholder="比如，云龙区 xxx 路 xx 号"
             />
             <button
               type="button"
@@ -208,37 +205,11 @@ export function UploadShopPanel({
           />
         </label>
 
-        <div className={styles.coordRow}>
-          <label className={styles.field}>
-            <span>纬度</span>
-            <input
-              type="number"
-              step="0.000001"
-              value={form.lat}
-              onChange={(event) => updateField("lat", Number(event.target.value))}
-            />
-          </label>
-
-          <label className={styles.field}>
-            <span>经度</span>
-            <input
-              type="number"
-              step="0.000001"
-              value={form.lng}
-              onChange={(event) => updateField("lng", Number(event.target.value))}
-            />
-          </label>
-        </div>
-
-        <div className={styles.tips}>
-          <span>默认坐标是徐州市中心</span>
-          <span>高德负责地址解析，左侧地图负责微调</span>
-          <span>{selectedCoords ? `当前选点：${selectedCoords.lat.toFixed(5)}, ${selectedCoords.lng.toFixed(5)}` : "还没选点时也能先手填坐标"}</span>
-        </div>
-
-        <button type="button" className={styles.toggleButton} onClick={onTogglePicker}>
-          {pickerEnabled ? "退出地图选点模式" : "开启地图选点模式"}
-        </button>
+        {selectedCoords || (form.lat !== null && form.lng !== null) ? (
+          <div className={styles.tips}>
+            <span>地图上已显示当前定位</span>
+          </div>
+        ) : null}
 
         <button
           type="submit"
@@ -248,7 +219,6 @@ export function UploadShopPanel({
           {submitting ? "上传中..." : "上传一家店"}
         </button>
 
-        <p className={styles.feedback}>当前坐标：{form.lat.toFixed(6)}, {form.lng.toFixed(6)}</p>
         {feedback ? <p className={styles.feedback}>{feedback}</p> : null}
       </form>
     </section>
