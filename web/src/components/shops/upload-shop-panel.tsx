@@ -93,7 +93,7 @@ export function UploadShopPanel({
       console.error("[shops] geocode failed", error);
       const message = error instanceof Error ? error.message : "unknown_geocode_error";
       if (message.includes("INVALID_USER_KEY") || message.includes("10001")) {
-        setFeedback("自动定位失败，当前高德 Key 无效。先直接提交地址，后面把 Vercel 里的 NEXT_PUBLIC_AMAP_KEY 换成可用 Web Key。");
+        setFeedback("自动定位失败，高德 Web 服务 Key 仍不可用。请检查 Vercel 里的 NEXT_PUBLIC_AMAP_WEB_SERVICE_KEY 是否填对，并重新部署后再试。现在也可以先直接提交地址。");
       } else {
         setFeedback(`自动定位失败（${message}），你可以先直接提交地址。`);
       }

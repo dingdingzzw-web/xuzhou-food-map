@@ -195,11 +195,15 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
     .update(payload)
     .eq("id", shopId)
     .select(SHOP_SELECT)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("[shops] update failed", error);
     throw new Error(error.message || "update_shop_failed");
+  }
+
+  if (!data) {
+    throw new Error("shop_not_found_or_not_updatable");
   }
 
   return data as Shop;
