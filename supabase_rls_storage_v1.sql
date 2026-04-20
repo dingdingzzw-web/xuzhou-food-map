@@ -42,8 +42,18 @@ with check (
   and length(btrim(creator_name)) > 0
 );
 
--- MVP 阶段不开放前端直接更新店铺主体信息
--- 后续如需支持上传者修改，再补 update policy
+-- 登录用户可补充店铺信息
+create policy if not exists "shops_update_authenticated"
+on public.shops
+for update
+to authenticated
+using (true)
+with check (
+  length(btrim(name)) > 0
+  and length(btrim(address)) > 0
+  and length(btrim(reason)) > 0
+  and length(btrim(creator_name)) > 0
+);
 
 -- =========================
 -- 3. shop_images policies

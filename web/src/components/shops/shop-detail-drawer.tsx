@@ -1,4 +1,7 @@
-import type { Shop } from "@/types/shop";
+"use client";
+
+import { useEffect, useState } from "react";
+import type { Shop, VoteType } from "@/types/shop";
 import {
   buildAmapUrl,
   buildAppleMapsUrl,
@@ -10,9 +13,98 @@ import styles from "./shop-detail-drawer.module.css";
 
 interface ShopDetailDrawerProps {
   shop: Shop;
+  onVote?: (shopId: string, voteType: VoteType) => Promise<void>;
+  onAddImage?: (shopId: string, imageUrl: string, uploaderName: string) => Promise<void>;
+  onUpdateDetails?: (
+    shopId: string,
+    input: { address?: string; reason?: string; alias?: string },
+  ) => Promise<void>;
 }
 
-export function ShopDetailDrawer({ shop }: ShopDetailDrawerProps) {
+export function ShopDetailDrawer({
+  shop,
+  onVote,
+  onAddImage,
+  onUpdateDetails,
+}: ShopDetailDrawerProps) {
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageUploader, setImageUploader] = useState("");
+  const [extraAddress, setExtraAddress] = useState("");
+  const [extraReason, setExtraReason] = useState("");
+  const [extraAlias, setExtraAlias] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [submittingVote, setSubmittingVote] = useState<VoteType | null>(null);
+  const [submittingImage, setSubmittingImage] = useState(false);
+  const [submittingDetails, setSubmittingDetails] = useState(false);
+
+  useEffect(() => {
+    setImageUrl("");
+    setImageUploader("");
+    setExtraAddress(shop.address || "");
+    setExtraReason(shop.reason || "");
+    setExtraAlias(shop.alias || "");
+    setFeedback("");
+  }, [shop]);
+
+  async function handleVote(voteType: VoteType) {
+    if (!onVote) return;
+
+    setSubmittingVote(voteType);
+    setFeedback("");
+
+    try {
+      await onVote(shop.id, voteType);
+      setFeedback(voteType === "good" ? "已记一票好次。" : "已记一票包次。");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown_vote_error";
+      setFeedback(`投票失败：${message}`);
+    } finally {
+      setSubmittingVote(null);
+    }
+  }
+
+  async function handleAddImage(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!onAddImage) return;
+
+    setSubmittingImage(true);
+    setFeedback("");
+
+    try {
+      await onAddImage(shop.id, imageUrl, imageUploader);
+      setImageUrl("");
+      setImageUploader("");
+      setFeedback("补图已提交，这家店的封面会更新成新图片。");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown_add_image_error";
+      setFeedback(`补图失败：${message}`);
+    } finally {
+      setSubmittingImage(false);
+    }
+  }
+
+  async function handleUpdateDetails(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!onUpdateDetails) return;
+
+    setSubmittingDetails(true);
+    setFeedback("");
+
+    try {
+      await onUpdateDetails(shop.id, {
+        address: extraAddress,
+        reason: extraReason,
+        alias: extraAlias,
+      });
+      setFeedback("商家补充信息已更新。");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown_update_error";
+      setFeedback(`补充信息失败：${message}`);
+    } finally {
+      setSubmittingDetails(false);
+    }
+  }
+
   return (
     <aside className={styles.drawer}>
       <div className={styles.coverWrap}>
@@ -28,6 +120,7 @@ export function ShopDetailDrawer({ shop }: ShopDetailDrawerProps) {
         <div>
           <p className={styles.eyebrow}>今日想冲</p>
           <h2>{shop.name}</h2>
+          {shop.alias?.trim() ? <p className={styles.alias}>别名：{shop.alias}</p> : null}
         </div>
         <div className={styles.votePills}>
           <span>好次 {shop.good_count}</span>
@@ -58,16 +151,71 @@ export function ShopDetailDrawer({ shop }: ShopDetailDrawerProps) {
       ) : null}
 
       <div className={styles.actions}>
-        <button type="button" className={styles.primary}>
-          好次一下
+        <button
+          type="button"
+          className={styles.primary}
+          onClick={() => handleVote("good")}
+          disabled={submittingVote !== null}
+        >
+          {submittingVote === "good" ? "提交中..." : "好次"}
         </button>
-        <button type="button" className={styles.secondary}>
-          包次提醒
-        </button>
-        <button type="button" className={styles.ghost}>
-          补一张图
+        <button
+          type="button"
+          className={styles.secondary}
+          onClick={() => handleVote("bad")}
+          disabled={submittingVote !== null}
+        >
+          {submittingVote === "bad" ? "提交中..." : "包次"}
         </button>
       </div>
+
+      <form className={styles.inlineForm} onSubmit={handleAddImage}>
+        <div className={styles.formHeader}>
+          <h3>补一张图</h3>
+          <span>支持先用图片链接补图</span>
+        </div>
+        <input
+          value={imageUrl}
+          onChange={(event) => setImageUrl(event.target.value)}
+          placeholder="贴一张门头、菜品或环境图链接"
+        />
+        <input
+          value={imageUploader}
+          onChange={(event) => setImageUploader(event.target.value)}
+          placeholder="你的昵称"
+        />
+        <button type="submit" className={styles.ghost} disabled={submittingImage}>
+          {submittingImage ? "提交中..." : "提交补图"}
+        </button>
+      </form>
+
+      <form className={styles.inlineForm} onSubmit={handleUpdateDetails}>
+        <div className={styles.formHeader}>
+          <h3>补充商家信息</h3>
+          <span>可补地址、推荐语、别名</span>
+        </div>
+        <input
+          value={extraAlias}
+          onChange={(event) => setExtraAlias(event.target.value)}
+          placeholder="比如，当地人常叫法 / 老名字"
+        />
+        <input
+          value={extraAddress}
+          onChange={(event) => setExtraAddress(event.target.value)}
+          placeholder="补充更完整的地址"
+        />
+        <textarea
+          value={extraReason}
+          onChange={(event) => setExtraReason(event.target.value)}
+          placeholder="补充这家店为什么值得去"
+          rows={4}
+        />
+        <button type="submit" className={styles.ghost} disabled={submittingDetails}>
+          {submittingDetails ? "提交中..." : "更新商家信息"}
+        </button>
+      </form>
+
+      {feedback ? <p className={styles.feedback}>{feedback}</p> : null}
 
       <div className={styles.navBlock}>
         <h3>打开导航</h3>

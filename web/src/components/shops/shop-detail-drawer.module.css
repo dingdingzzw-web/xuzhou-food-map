@@ -40,6 +40,12 @@
   color: #4e3120;
 }
 
+.alias {
+  margin-top: 8px;
+  color: #8d5f3d;
+  font-size: 14px;
+}
+
 .votePills {
   display: flex;
   gap: 10px;
@@ -61,7 +67,10 @@
   gap: 8px;
 }
 
-.block h3 {
+.block h3,
+.formHeader h3,
+.navBlock h3,
+.noticeBlock h3 {
   color: #6c452d;
   font-size: 14px;
 }
@@ -82,11 +91,6 @@
   border: 1px dashed rgba(176, 106, 55, 0.24);
 }
 
-.noticeBlock h3 {
-  color: #8e572f;
-  font-size: 14px;
-}
-
 .noticeBlock p {
   color: #7a593e;
   font-size: 14px;
@@ -99,7 +103,8 @@
   gap: 12px;
 }
 
-.actions button {
+.actions button,
+.ghost {
   border: 0;
   border-radius: 16px;
   padding: 14px 16px;
@@ -118,22 +123,59 @@
   color: #85512d;
 }
 
+.inlineForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 246, 235, 0.92);
+  border: 1px solid rgba(118, 76, 47, 0.08);
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formHeader span {
+  color: #8e6445;
+  font-size: 12px;
+}
+
+.inlineForm input,
+.inlineForm textarea {
+  width: 100%;
+  border: 1px solid rgba(132, 84, 49, 0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  background: #fffdfa;
+  outline: none;
+}
+
+.inlineForm textarea {
+  resize: vertical;
+}
+
 .ghost {
-  grid-column: 1 / -1;
   background: transparent;
   border: 1px solid rgba(118, 76, 47, 0.14) !important;
   color: #70472f;
+}
+
+.feedback {
+  color: #7a5336;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-line;
 }
 
 .navBlock {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.navBlock h3 {
-  color: #6c452d;
-  font-size: 14px;
 }
 
 .navLinks {

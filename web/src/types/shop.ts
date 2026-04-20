@@ -9,6 +9,7 @@ export interface Shop {
   cover_image_url?: string | null;
   reason: string;
   creator_name: string;
+  alias?: string | null;
   good_count: number;
   bad_count: number;
   created_at?: string;
@@ -21,4 +22,10 @@ export interface ShopImage {
   image_url: string;
   uploader_name: string;
   created_at?: string;
+}
+
+export interface ShopUpdateInput {
+  address?: string;
+  reason?: string;
+  alias?: string;
 }

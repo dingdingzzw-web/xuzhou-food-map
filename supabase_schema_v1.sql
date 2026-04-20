@@ -16,9 +16,10 @@ create table if not exists public.shops (
   address text not null,
   lat numeric(10, 7) not null,
   lng numeric(10, 7) not null,
-  cover_image_url text not null,
+  cover_image_url text,
   reason text not null,
   creator_name text not null,
+  alias text,
   good_count integer not null default 0,
   bad_count integer not null default 0,
   created_at timestamptz not null default now(),
@@ -42,6 +43,7 @@ comment on table public.shops is '店铺主表';
 comment on column public.shops.cover_image_url is '店铺封面图';
 comment on column public.shops.reason is '推荐理由';
 comment on column public.shops.creator_name is '上传者昵称';
+comment on column public.shops.alias is '店铺别名 / 民间叫法';
 comment on column public.shops.good_count is '好次数';
 comment on column public.shops.bad_count is '包次数';
 

@@ -5,9 +5,9 @@ import { ZoomableMap } from "@/components/map/zoomable-map";
 import { ShopDetailDrawer } from "@/components/shops/shop-detail-drawer";
 import { ShopCard } from "@/components/shops/shop-card";
 import { UploadShopPanel } from "@/components/shops/upload-shop-panel";
-import { createShop, fetchShops } from "@/lib/shops";
+import { addShopImage, createShop, fetchShops, updateShopDetails, voteShop } from "@/lib/shops";
 import { mockShops } from "@/lib/mock-shops";
-import type { Shop } from "@/types/shop";
+import type { Shop, VoteType } from "@/types/shop";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -57,7 +57,8 @@ export default function Home() {
     return shops.filter(
       (shop) =>
         shop.name.toLowerCase().includes(q) ||
-        shop.address.toLowerCase().includes(q),
+        shop.address.toLowerCase().includes(q) ||
+        shop.alias?.toLowerCase().includes(q),
     );
   }, [keyword, shops]);
 
@@ -72,6 +73,39 @@ export default function Home() {
     setActiveShopId(created.id);
     setDataSource("supabase");
     return created;
+  }
+
+  async function handleVote(shopId: string, voteType: VoteType) {
+    await voteShop(shopId, voteType);
+    const result = await fetchShops();
+    setShops(result.shops.length ? result.shops : mockShops);
+    setDataSource(result.source);
+  }
+
+  async function handleAddImage(shopId: string, imageUrl: string, uploaderName: string) {
+    await addShopImage({ shopId, imageUrl, uploaderName });
+
+    setShops((current) =>
+      current.map((shop) =>
+        shop.id === shopId
+          ? {
+              ...shop,
+              cover_image_url: imageUrl,
+            }
+          : shop,
+      ),
+    );
+  }
+
+  async function handleUpdateDetails(
+    shopId: string,
+    input: { address?: string; reason?: string; alias?: string },
+  ) {
+    const updated = await updateShopDetails(shopId, input);
+
+    setShops((current) =>
+      current.map((shop) => (shop.id === shopId ? updated : shop)),
+    );
   }
 
   return (
@@ -132,7 +166,14 @@ export default function Home() {
         </div>
 
         <div className={styles.sideColumn}>
-          {activeShop ? <ShopDetailDrawer shop={activeShop} /> : null}
+          {activeShop ? (
+            <ShopDetailDrawer
+              shop={activeShop}
+              onVote={handleVote}
+              onAddImage={handleAddImage}
+              onUpdateDetails={handleUpdateDetails}
+            />
+          ) : null}
         </div>
       </section>
 
