@@ -1,7 +1,22 @@
 import type { Shop } from "@/types/shop";
 
+const DEFAULT_COVER_PATTERNS = [
+  "images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+  "images.unsplash.com/photo-1552566626-52f8b828add9",
+  "images.unsplash.com/photo-1528605248644-14dd04022da1",
+];
+
+export function isDefaultShopCover(url?: string | null) {
+  const normalized = url?.trim() || "";
+  if (!normalized) return false;
+  return DEFAULT_COVER_PATTERNS.some((pattern) => normalized.includes(pattern));
+}
+
 export function hasShopCover(shop: Pick<Shop, "cover_image_url">) {
-  return Boolean(shop.cover_image_url?.trim());
+  const normalized = shop.cover_image_url?.trim() || "";
+  if (!normalized) return false;
+  if (isDefaultShopCover(normalized)) return false;
+  return true;
 }
 
 export function ShopCoverPlaceholder({ compact = false }: { compact?: boolean }) {
