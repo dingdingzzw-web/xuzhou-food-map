@@ -109,6 +109,28 @@ export async function addShopImage(input: {
   return data as ShopImage;
 }
 
+export async function updateShopCover(shopId: string, imageUrl: string): Promise<Shop> {
+  const client = await ensureAnonymousSession();
+
+  if (!client) {
+    throw new Error("missing_supabase_env");
+  }
+
+  const { data, error } = await client
+    .from("shops")
+    .update({ cover_image_url: imageUrl.trim() })
+    .eq("id", shopId)
+    .select(SHOP_SELECT)
+    .single();
+
+  if (error) {
+    console.error("[shops] update cover failed", error);
+    throw new Error(error.message || "update_shop_cover_failed");
+  }
+
+  return data as Shop;
+}
+
 export async function updateShopDetails(shopId: string, input: ShopUpdateInput): Promise<Shop> {
   const client = await ensureAnonymousSession();
 

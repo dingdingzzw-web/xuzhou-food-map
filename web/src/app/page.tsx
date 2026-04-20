@@ -5,7 +5,7 @@ import { CustomMap } from "@/components/map/custom-map";
 import { ShopDetailDrawer } from "@/components/shops/shop-detail-drawer";
 import { ShopCard } from "@/components/shops/shop-card";
 import { UploadShopPanel } from "@/components/shops/upload-shop-panel";
-import { addShopImage, createShop, fetchShops, updateShopDetails, voteShop } from "@/lib/shops";
+import { addShopImage, createShop, fetchShops, updateShopCover, updateShopDetails, voteShop } from "@/lib/shops";
 import type { Shop, VoteType } from "@/types/shop";
 import styles from "./page.module.css";
 
@@ -87,16 +87,10 @@ export default function Home() {
 
   async function handleAddImage(shopId: string, imageUrl: string, uploaderName: string) {
     await addShopImage({ shopId, imageUrl, uploaderName });
+    const updated = await updateShopCover(shopId, imageUrl);
 
     setShops((current) =>
-      current.map((shop) =>
-        shop.id === shopId
-          ? {
-              ...shop,
-              cover_image_url: imageUrl,
-            }
-          : shop,
-      ),
+      current.map((shop) => (shop.id === shopId ? updated : shop)),
     );
   }
 
