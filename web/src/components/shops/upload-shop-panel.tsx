@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { hasAmapEnv } from "@/lib/env";
+import { hasAmapWebServiceEnv } from "@/lib/env";
 import { geocodeAddress } from "@/lib/geocode";
 import type { Shop } from "@/types/shop";
 import styles from "./upload-shop-panel.module.css";
@@ -71,8 +71,8 @@ export function UploadShopPanel({
       return;
     }
 
-    if (!hasAmapEnv) {
-      setFeedback("还没配置高德 Key，暂时不能自动定位。先直接提交地址，后面再补定位。");
+    if (!hasAmapWebServiceEnv) {
+      setFeedback("还没配置高德 Web 服务 Key，暂时不能自动定位。先直接提交地址，后面再补定位。");
       return;
     }
 

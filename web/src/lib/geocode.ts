@@ -1,4 +1,4 @@
-import { env, hasAmapEnv } from "@/lib/env";
+import { env, hasAmapWebServiceEnv } from "@/lib/env";
 
 interface AmapGeocodeResponse {
   status?: string;
@@ -11,12 +11,12 @@ interface AmapGeocodeResponse {
 }
 
 export async function geocodeAddress(address: string) {
-  if (!hasAmapEnv) {
-    throw new Error("missing_amap_key");
+  if (!hasAmapWebServiceEnv) {
+    throw new Error("missing_amap_web_service_key");
   }
 
   const query = new URLSearchParams({
-    key: env.amapKey,
+    key: env.amapWebServiceKey,
     address,
     city: "徐州",
     output: "JSON",
