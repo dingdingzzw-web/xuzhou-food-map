@@ -93,19 +93,14 @@
   cursor: pointer;
 }
 
-.mapSection,
 .listBlock {
   border-radius: 28px;
   border: 1px solid rgba(104, 64, 34, 0.08);
   background: rgba(255, 251, 245, 0.82);
   box-shadow: 0 24px 60px rgba(102, 68, 40, 0.08);
-}
-
-.mapSection {
   padding: 22px;
 }
 
-.mapHeader,
 .blockHeader {
   display: flex;
   align-items: center;
@@ -114,7 +109,6 @@
   margin-bottom: 18px;
 }
 
-.mapHeader h2,
 .blockHeader h2 {
   margin-top: 12px;
   color: #4f2f1e;
@@ -128,32 +122,8 @@
   margin-top: 24px;
 }
 
-.mapColumn,
 .sideColumn {
   min-width: 0;
-}
-
-.mapColumn {
-  position: relative;
-}
-
-.mapColumn::after {
-  content: "已标注饭店点位";
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  z-index: 3;
-  padding: 10px 12px;
-  border-radius: 999px;
-  background: rgba(255, 251, 245, 0.94);
-  color: #9b653a;
-  font-size: 12px;
-  font-weight: 700;
-  box-shadow: 0 12px 24px rgba(80, 53, 31, 0.08);
-}
-
-.listBlock {
-  padding: 22px;
 }
 
 .count {
@@ -220,12 +190,5 @@
 
   .uploadButton {
     width: 100%;
-  }
-}
-
-@media (max-width: 640px) {
-  .mapColumn::after {
-    top: 12px;
-    left: 12px;
   }
 }

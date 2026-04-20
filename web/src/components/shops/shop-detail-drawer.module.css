@@ -81,7 +81,8 @@
   line-height: 1.6;
 }
 
-.noticeBlock {
+.noticeBlock,
+.mapHintBlock {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -91,7 +92,8 @@
   border: 1px dashed rgba(176, 106, 55, 0.24);
 }
 
-.noticeBlock p {
+.noticeBlock p,
+.mapHintBlock p {
   color: #7a593e;
   font-size: 14px;
   line-height: 1.6;

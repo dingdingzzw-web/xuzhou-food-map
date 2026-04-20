@@ -143,6 +143,11 @@ export function ShopDetailDrawer({
         <p>{shop.address}</p>
       </div>
 
+      <div className={styles.mapHintBlock}>
+        <h3>位置参考</h3>
+        <p>这里先不内嵌交互地图了，直接用外部地图导航更稳。点下面按钮即可打开。</p>
+      </div>
+
       <div className={styles.block}>
         <h3>推荐理由</h3>
         <p>{shop.reason}</p>

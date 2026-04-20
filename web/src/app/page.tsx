@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AMapView } from "@/components/map/amap-view";
-import { CustomMap } from "@/components/map/custom-map";
 import { ShopDetailDrawer } from "@/components/shops/shop-detail-drawer";
 import { ShopCard } from "@/components/shops/shop-card";
 import { UploadShopPanel } from "@/components/shops/upload-shop-panel";
@@ -18,8 +16,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [pickerCoords, setPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [pickerEnabled, setPickerEnabled] = useState(false);
-  const [mapMode, setMapMode] = useState<"amap" | "custom">("amap");
   const uploadPanelRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -112,7 +108,7 @@ export default function Home() {
         <div className={styles.heroText}>
           <span className={styles.kicker}>徐州本地共建地图</span>
           <h1>徐州美食地图</h1>
-          <p>先把大家推荐的店收进来。</p>
+          <p>先把大家推荐的店收进来，地图只做大概位置参考，导航交给外部地图。</p>
         </div>
       </section>
 
@@ -134,43 +130,16 @@ export default function Home() {
         </button>
       </section>
 
-      <section className={styles.mapSection}>
-        <div className={styles.mapHeader}>
-          <div>
-            <span className={styles.kicker}>地图优先</span>
-            <h2>先看地图上的店</h2>
-          </div>
-          <span className={styles.count}>
-            {isLoading ? "加载中..." : `${filteredShops.length} 家`}
-          </span>
-        </div>
-
-        <div className={styles.mapColumn}>
-          {mapMode === "amap" ? (
-            <AMapView
-              shops={filteredShops}
-              activeShopId={activeShop?.id}
-              pickerPosition={pickerCoords}
-              onSelectShop={(shop) => setActiveShopId(shop.id)}
-              onMapError={() => setMapMode("custom")}
-            />
-          ) : (
-            <CustomMap
-              shops={filteredShops}
-              activeShopId={activeShop?.id}
-              onSelectShop={(shop) => setActiveShopId(shop.id)}
-            />
-          )}
-        </div>
-      </section>
-
       <section className={styles.contentGrid}>
         <div className={styles.listBlock}>
           <div className={styles.blockHeader}>
             <div>
               <span className={styles.kicker}>饭店列表</span>
-              <h2>按列表继续看</h2>
+              <h2>先从这些店开始</h2>
             </div>
+            <span className={styles.count}>
+              {isLoading ? "加载中..." : `${filteredShops.length} 家`}
+            </span>
           </div>
 
           {loadError ? <p className={styles.loadError}>{loadError}</p> : null}
@@ -208,12 +177,9 @@ export default function Home() {
             <UploadShopPanel
               onCreateShop={handleCreateShop}
               selectedCoords={pickerCoords}
-              pickerEnabled={pickerEnabled}
               onAutoLocate={(coords) => {
                 setPickerCoords(coords);
-                setPickerEnabled(true);
               }}
-              onTogglePicker={() => setPickerEnabled((current) => !current)}
             />
           </section>
         </div>
