@@ -54,8 +54,7 @@ export function AMapView({
         new window.AMap.Marker({
           map: mapRef.current,
           position: XUZHOU_CENTER,
-          offset: new window.AMap.Pixel(-8, -8),
-          content: '<div style="width:16px;height:16px;border-radius:999px;background:#2563eb;border:3px solid #ffffff;box-shadow:0 6px 16px rgba(0,0,0,0.18);"></div>',
+          title: "徐州中心测试点",
         });
 
         setMessage("高德地图已接入");
@@ -98,13 +97,14 @@ export function AMapView({
     markersRef.current = [];
 
     const nextMarkers = shopsWithCoords.map((shop) => {
-      const isActive = shop.id === activeShopId;
       const marker = new AMap.Marker({
         map: mapRef.current,
         position: [Number(shop.lng), Number(shop.lat)],
         title: shop.name,
-        offset: new AMap.Pixel(-10, -10),
-        content: `<div style="display:flex;align-items:center;justify-content:center;width:${isActive ? 22 : 18}px;height:${isActive ? 22 : 18}px;border-radius:999px;background:${isActive ? "#b2451d" : "#d66f2d"};border:3px solid #fff6ec;box-shadow:0 6px 16px rgba(0,0,0,0.18);"></div>`,
+        label: {
+          direction: "top",
+          content: shop.name,
+        },
       });
 
       marker.on?.("click", () => onSelectShop?.(shop));
@@ -131,12 +131,6 @@ export function AMapView({
 
   const isInvalidUserKey = env.amapKey === "";
 
-  const debugSamples = shops.slice(0, 5).map((shop) => {
-    const lat = Number(shop.lat);
-    const lng = Number(shop.lng);
-    return `${shop.name} | lat=${String(shop.lat)} -> ${Number.isFinite(lat) ? lat : "NaN"} | lng=${String(shop.lng)} -> ${Number.isFinite(lng) ? lng : "NaN"}`;
-  });
-
   return (
     <div className={styles.wrap}>
       <div ref={containerRef} className={styles.map} />
@@ -146,14 +140,6 @@ export function AMapView({
           当前高德 Key 不可用，自动定位会失败。先直接提交地址，后面再修 Key。
         </div>
       ) : null}
-      <div className={styles.debugBox}>
-        <strong>地图调试</strong>
-        <span>店铺总数：{shops.length}</span>
-        <span>可用坐标数：{shops.filter((shop) => Number.isFinite(Number(shop.lat)) && Number.isFinite(Number(shop.lng))).length}</span>
-        {debugSamples.map((line) => (
-          <code key={line}>{line}</code>
-        ))}
-      </div>
     </div>
   );
 }
