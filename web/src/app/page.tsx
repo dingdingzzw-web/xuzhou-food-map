@@ -12,10 +12,11 @@ import styles from "./page.module.css";
 
 export default function Home() {
   const [keyword, setKeyword] = useState("");
-  const [shops, setShops] = useState<Shop[]>(mockShops);
-  const [activeShopId, setActiveShopId] = useState(mockShops[0]?.id ?? "");
-  const [dataSource, setDataSource] = useState<"supabase" | "mock">("mock");
+  const [shops, setShops] = useState<Shop[]>([]);
+  const [activeShopId, setActiveShopId] = useState("");
+  const [dataSource, setDataSource] = useState<"supabase" | "mock">("supabase");
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [pickerCoords, setPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [pickerEnabled, setPickerEnabled] = useState(false);
 
@@ -27,14 +28,16 @@ export default function Home() {
         const result = await fetchShops();
         if (cancelled) return;
 
-        setShops(result.shops.length ? result.shops : mockShops);
+        setShops(result.shops);
         setDataSource(result.source);
-        setActiveShopId((current) => current || result.shops[0]?.id || mockShops[0]?.id || "");
+        setActiveShopId((current) => current || result.shops[0]?.id || "");
+        setLoadError("");
       } catch (error) {
         console.error("[shops] load failed", error);
         if (!cancelled) {
-          setShops(mockShops);
-          setDataSource("mock");
+          setShops([]);
+          setDataSource("supabase");
+          setLoadError("当前没读到线上店铺数据，请先检查 Supabase 读权限或环境变量。");
         }
       } finally {
         if (!cancelled) {
@@ -67,7 +70,6 @@ export default function Home() {
 
   async function handleCreateShop(input: Parameters<typeof createShop>[0]) {
     const created = await createShop(input);
-    if (!created) return null;
 
     setShops((current) => [created, ...current]);
     setActiveShopId(created.id);
@@ -78,7 +80,7 @@ export default function Home() {
   async function handleVote(shopId: string, voteType: VoteType) {
     await voteShop(shopId, voteType);
     const result = await fetchShops();
-    setShops(result.shops.length ? result.shops : mockShops);
+    setShops(result.shops);
     setDataSource(result.source);
   }
 
@@ -169,6 +171,15 @@ export default function Home() {
               {isLoading ? "加载中..." : `${filteredShops.length} 家`}
             </span>
           </div>
+
+          {loadError ? <p className={styles.loadError}>{loadError}</p> : null}
+
+          {!isLoading && !filteredShops.length ? (
+            <div className={styles.emptyState}>
+              <p>还没有读取到店铺数据。</p>
+              <span>如果你刚上传过店铺但这里是空的，通常是 Supabase 读取权限或环境变量还没完全配通。</span>
+            </div>
+          ) : null}
 
           <div className={styles.shopList}>
             {filteredShops.map((shop) => (
