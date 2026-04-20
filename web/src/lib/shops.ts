@@ -1,5 +1,4 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase";
-import { mockShops } from "@/lib/mock-shops";
 import type { CreateShopInput } from "@/components/shops/upload-shop-panel";
 import type { Shop, ShopImage, ShopUpdateInput, VoteType } from "@/types/shop";
 
@@ -26,12 +25,12 @@ export async function ensureAnonymousSession() {
 
 export async function fetchShops(): Promise<{
   shops: Shop[];
-  source: "supabase" | "mock";
+  source: "supabase";
 }> {
   const client = await ensureAnonymousSession();
 
   if (!client) {
-    return { shops: mockShops, source: "mock" };
+    throw new Error("missing_supabase_env");
   }
 
   const { data, error } = await client
@@ -40,8 +39,8 @@ export async function fetchShops(): Promise<{
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("[shops] fetch failed, fallback to mock data", error);
-    return { shops: mockShops, source: "mock" };
+    console.error("[shops] fetch failed", error);
+    throw new Error(error.message || "fetch_shops_failed");
   }
 
   return {
