@@ -43,6 +43,31 @@
   box-shadow: 0 12px 32px rgba(83, 54, 31, 0.08);
 }
 
+.debugBox {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 420px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 251, 245, 0.94);
+  border: 1px solid rgba(92, 58, 33, 0.1);
+  color: #6f4c34;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 12px 32px rgba(83, 54, 31, 0.08);
+}
+
+.debugBox code {
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 @media (max-width: 900px) {
   .wrap,
   .map {
@@ -54,6 +79,11 @@
     left: 20px;
     right: 20px;
     bottom: 84px;
+    max-width: none;
+  }
+
+  .debugBox {
+    right: 20px;
     max-width: none;
   }
 }

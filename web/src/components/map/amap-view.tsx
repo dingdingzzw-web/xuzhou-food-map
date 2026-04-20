@@ -131,6 +131,12 @@ export function AMapView({
 
   const isInvalidUserKey = env.amapKey === "";
 
+  const debugSamples = shops.slice(0, 5).map((shop) => {
+    const lat = Number(shop.lat);
+    const lng = Number(shop.lng);
+    return `${shop.name} | lat=${String(shop.lat)} -> ${Number.isFinite(lat) ? lat : "NaN"} | lng=${String(shop.lng)} -> ${Number.isFinite(lng) ? lng : "NaN"}`;
+  });
+
   return (
     <div className={styles.wrap}>
       <div ref={containerRef} className={styles.map} />
@@ -140,6 +146,14 @@ export function AMapView({
           当前高德 Key 不可用，自动定位会失败。先直接提交地址，后面再修 Key。
         </div>
       ) : null}
+      <div className={styles.debugBox}>
+        <strong>地图调试</strong>
+        <span>店铺总数：{shops.length}</span>
+        <span>可用坐标数：{shops.filter((shop) => Number.isFinite(Number(shop.lat)) && Number.isFinite(Number(shop.lng))).length}</span>
+        {debugSamples.map((line) => (
+          <code key={line}>{line}</code>
+        ))}
+      </div>
     </div>
   );
 }
