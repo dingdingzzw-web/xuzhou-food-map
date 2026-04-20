@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ZoomableMap } from "@/components/map/zoomable-map";
+import { CustomMap } from "@/components/map/custom-map";
 import { ShopDetailDrawer } from "@/components/shops/shop-detail-drawer";
 import { ShopCard } from "@/components/shops/shop-card";
 import { UploadShopPanel } from "@/components/shops/upload-shop-panel";
 import { addShopImage, createShop, fetchShops, updateShopDetails, voteShop } from "@/lib/shops";
-import { mockShops } from "@/lib/mock-shops";
 import type { Shop, VoteType } from "@/types/shop";
 import styles from "./page.module.css";
 
@@ -144,13 +143,10 @@ export default function Home() {
 
       <section className={styles.mainGrid}>
         <div className={styles.mapColumn}>
-          <ZoomableMap
+          <CustomMap
             shops={filteredShops}
             activeShopId={activeShop?.id}
-            pickerPosition={pickerCoords}
-            pickerEnabled={pickerEnabled}
             onSelectShop={(shop) => setActiveShopId(shop.id)}
-            onPickLocation={(coords) => setPickerCoords(coords)}
           />
         </div>
 
