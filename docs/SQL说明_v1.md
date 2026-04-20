@@ -9,9 +9,8 @@
 - `shop_images`
 - `shop_votes`
 
-并且额外做了 3 件实用的事：
+并且额外做了 2 件实用的事：
 - 自动维护 `updated_at`
-- 自动同步店铺首图到 `shop_images`
 - 自动维护 `shops.good_count` / `shops.bad_count`
 
 ---
@@ -44,11 +43,11 @@
 - 存首图
 - 存后续补图
 
-设计上，新增店铺时：
-- `shops.cover_image_url` 是主封面
-- 触发器会自动把这张图也写进 `shop_images`
+当前建议做法：
+- `shops.cover_image_url` 仍作为主封面
+- 前端在创建店铺成功后，如有需要，再显式插入一条 `shop_images`
 
-这样以后店铺详情页查图片列表时，只查 `shop_images` 就够了。
+这样可以避开数据库 trigger 与 RLS 的耦合问题，MVP 更稳。
 
 ---
 
@@ -107,21 +106,12 @@
 
 ---
 
-## 下一步最该做什么
+## 额外提醒
 
-我建议下一步直接做这两个之一：
+如果你启用了 RLS，MVP 阶段不建议再让 `shops` 的 after insert trigger 自动写 `shop_images`。
 
-### 方案 A
-补一份 **Supabase RLS / Storage 规则 v1**
+更稳的方式是：
+- 前端先创建 `shops`
+- 成功后再单独写 `shop_images`
 
-适合马上准备真接 Supabase。
-
-### 方案 B
-开始建 **Next.js 项目骨架**
-
-适合先把前端页面跑起来。
-
-如果按开发顺序，我更建议先补：
-**RLS + Storage 规则**
-
-因为图片上传和表写入会马上用到。
+这样报错路径更清晰，也更容易排查权限问题。

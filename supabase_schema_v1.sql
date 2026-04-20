@@ -171,40 +171,13 @@ after insert or update or delete on public.shop_votes
 for each row
 execute function public.handle_shop_votes_change();
 
--- =========================
--- 7. 创建店铺时自动补一条首图记录
--- =========================
-create or replace function public.create_initial_shop_image()
-returns trigger
-language plpgsql
-as $$
-begin
-  insert into public.shop_images (
-    shop_id,
-    image_url,
-    uploader_name
-  ) values (
-    new.id,
-    new.cover_image_url,
-    new.creator_name
-  );
-
-  return new;
-end;
-$$;
-
-drop trigger if exists trg_shops_after_insert_image on public.shops;
-create trigger trg_shops_after_insert_image
-after insert on public.shops
-for each row
-execute function public.create_initial_shop_image();
-
 commit;
 
 -- =========================
--- 8. 使用建议
+-- 7. 使用建议
 -- =========================
--- 1) 新建店铺时，直接写入 shops 即可，首图会自动同步到 shop_images
+-- 1) 新建店铺时，前端先写入 shops，再按需插入首图到 shop_images
+--    这样能避免 after insert trigger 与 RLS 策略相互影响
 -- 2) 用户补图时，插入 shop_images
 -- 3) 用户投票时：
 --    - 未投票：insert shop_votes
