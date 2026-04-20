@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { uploadShopImageFile } from "@/lib/storage";
 import type { Shop, VoteType } from "@/types/shop";
 import {
   buildAmapUrl,
@@ -27,7 +28,7 @@ export function ShopDetailDrawer({
   onAddImage,
   onUpdateDetails,
 }: ShopDetailDrawerProps) {
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUploader, setImageUploader] = useState("");
   const [extraAddress, setExtraAddress] = useState("");
   const [extraReason, setExtraReason] = useState("");
@@ -38,7 +39,7 @@ export function ShopDetailDrawer({
   const [submittingDetails, setSubmittingDetails] = useState(false);
 
   useEffect(() => {
-    setImageUrl("");
+    setImageFile(null);
     setImageUploader("");
     setExtraAddress(shop.address || "");
     setExtraReason(shop.reason || "");
@@ -71,8 +72,13 @@ export function ShopDetailDrawer({
     setFeedback("");
 
     try {
-      await onAddImage(shop.id, imageUrl, imageUploader);
-      setImageUrl("");
+      if (!imageFile) {
+        throw new Error("missing_image_file");
+      }
+
+      const uploaded = await uploadShopImageFile(imageFile, shop.id);
+      await onAddImage(shop.id, uploaded.publicUrl, imageUploader);
+      setImageFile(null);
       setImageUploader("");
       setFeedback("补图已提交，这家店的封面会更新成新图片。");
     } catch (error) {
@@ -172,20 +178,24 @@ export function ShopDetailDrawer({
       <form className={styles.inlineForm} onSubmit={handleAddImage}>
         <div className={styles.formHeader}>
           <h3>补一张图</h3>
-          <span>支持先用图片链接补图</span>
+          <span>直接选本地图片上传到云端</span>
         </div>
         <input
-          value={imageUrl}
-          onChange={(event) => setImageUrl(event.target.value)}
-          placeholder="贴一张门头、菜品或环境图链接"
+          type="file"
+          accept="image/*"
+          onChange={(event) => setImageFile(event.target.files?.[0] || null)}
         />
         <input
           value={imageUploader}
           onChange={(event) => setImageUploader(event.target.value)}
           placeholder="你的昵称"
         />
-        <button type="submit" className={styles.ghost} disabled={submittingImage}>
-          {submittingImage ? "提交中..." : "提交补图"}
+        <button
+          type="submit"
+          className={styles.ghost}
+          disabled={submittingImage || !imageFile || !imageUploader.trim()}
+        >
+          {submittingImage ? "上传中..." : "上传补图"}
         </button>
       </form>
 
