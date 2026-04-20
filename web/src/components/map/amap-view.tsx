@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { env } from "@/lib/env";
 import { loadAmapSdk } from "@/lib/amap";
 import type { Shop } from "@/types/shop";
@@ -26,13 +26,21 @@ export function AMapView({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<{
     destroy?: () => void;
-    add?: (overlays: unknown[]) => void;
     setFitView?: (overlays?: unknown[]) => void;
     clearMap?: () => void;
     setZoomAndCenter?: (zoom: number, center: [number, number]) => void;
   } | null>(null);
-  const markersRef = useRef<unknown[]>([]);
   const [message, setMessage] = useState("正在接入徐州地图...");
+
+  const shopsWithCoords = useMemo(
+    () =>
+      shops.filter((shop): shop is Shop & { lat: number; lng: number } => {
+        const lat = Number(shop.lat);
+        const lng = Number(shop.lng);
+        return Number.isFinite(lat) && Number.isFinite(lng);
+      }),
+    [shops],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -81,33 +89,6 @@ export function AMapView({
   useEffect(() => {
     if (!window.AMap || !mapRef.current) return;
 
-    const AMap = window.AMap;
-    const shopsWithCoords = shops.filter((shop): shop is Shop & { lat: number; lng: number } => {
-      const lat = Number(shop.lat);
-      const lng = Number(shop.lng);
-      return Number.isFinite(lat) && Number.isFinite(lng);
-    });
-
-    mapRef.current.clearMap?.();
-    markersRef.current = [];
-
-    const nextMarkers = shopsWithCoords.map((shop) => {
-      const marker = new AMap.Marker({
-        map: mapRef.current,
-        position: [Number(shop.lng), Number(shop.lat)],
-        title: shop.name,
-        label: {
-          direction: "top",
-          content: shop.name,
-        },
-      });
-
-      marker.on?.("click", () => onSelectShop?.(shop));
-      return marker;
-    });
-
-    markersRef.current = nextMarkers;
-
     if (activeShopId) {
       const activeShop = shopsWithCoords.find((shop) => shop.id === activeShopId);
       if (activeShop) {
@@ -117,21 +98,22 @@ export function AMapView({
       }
     }
 
-    if (nextMarkers.length === 1) {
+    if (shopsWithCoords.length === 1) {
       const onlyShop = shopsWithCoords[0];
       if (onlyShop) {
         mapRef.current.setZoomAndCenter?.(15, [Number(onlyShop.lng), Number(onlyShop.lat)]);
         setMessage(`地图已定位到 ${onlyShop.name}`);
       }
-    } else if (nextMarkers.length > 1) {
-      mapRef.current.setFitView?.(nextMarkers);
-      setMessage(`地图已标注 ${nextMarkers.length} 家店`);
+    } else if (shopsWithCoords.length > 1) {
+      const bounds = shopsWithCoords.map((shop) => [Number(shop.lng), Number(shop.lat)] as [number, number]);
+      mapRef.current.setFitView?.(bounds);
+      setMessage(`地图已覆盖 ${shopsWithCoords.length} 家店所在区域`);
     }
 
-    if (!nextMarkers.length) {
+    if (!shopsWithCoords.length) {
       setMessage("当前店铺还没有可展示的定位点");
     }
-  }, [shops, activeShopId, onSelectShop]);
+  }, [shopsWithCoords, activeShopId]);
 
   const isInvalidUserKey = env.amapKey === "";
 
@@ -139,6 +121,23 @@ export function AMapView({
     <div className={styles.wrap}>
       <div ref={containerRef} className={styles.map} />
       <div className={styles.badge}>{message}</div>
+      <div className={styles.shopOverlay}>
+        <strong>已收录店铺</strong>
+        {shopsWithCoords.length ? (
+          shopsWithCoords.map((shop) => (
+            <button
+              key={shop.id}
+              type="button"
+              className={`${styles.shopChip} ${shop.id === activeShopId ? styles.shopChipActive : ""}`.trim()}
+              onClick={() => onSelectShop?.(shop)}
+            >
+              {shop.name}
+            </button>
+          ))
+        ) : (
+          <span className={styles.shopEmpty}>还没有可展示坐标</span>
+        )}
+      </div>
       {isInvalidUserKey ? (
         <div className={styles.warning}>
           当前高德 Key 不可用，自动定位会失败。先直接提交地址，后面再修 Key。
