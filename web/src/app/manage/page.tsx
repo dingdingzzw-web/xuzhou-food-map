@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ensureAnonymousSession, updateShopDetails } from "@/lib/shops";
+import { deleteShop, ensureAnonymousSession, updateShopDetails } from "@/lib/shops";
+import { env } from "@/lib/env";
 import type { Shop } from "@/types/shop";
 import styles from "./page.module.css";
-
-const ADMIN_PASSCODE = "xuzhou-keeper-2026";
 
 export default function ManagePage() {
   const [passcode, setPasscode] = useState("");
@@ -137,7 +136,7 @@ export default function ManagePage() {
             type="button"
             className={styles.button}
             onClick={() => {
-              if (passcode === ADMIN_PASSCODE) {
+              if (passcode === env.adminPasscode) {
                 setAuthorized(true);
                 setLoading(true);
               } else {
@@ -258,6 +257,29 @@ export default function ManagePage() {
                   }}
                 >
                   立即隐藏
+                </button>
+                <button
+                  type="button"
+                  className={styles.dangerButton}
+                  onClick={async () => {
+                    if (!activeShop) return;
+                    const confirmed = window.confirm(`确认彻底删除「${activeShop.name}」吗？这个动作不可恢复。`);
+                    if (!confirmed) return;
+                    setSaving(true);
+                    try {
+                      await deleteShop(activeShop.id);
+                      setShops((current) => current.filter((shop) => shop.id !== activeShop.id));
+                      setActiveShopId("");
+                      setFeedback("店铺已删除。");
+                    } catch (error) {
+                      const message = error instanceof Error ? error.message : "unknown_delete_error";
+                      setFeedback(`删除失败：${message}`);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                >
+                  彻底删除
                 </button>
               </div>
             </form>

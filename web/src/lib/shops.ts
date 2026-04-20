@@ -36,7 +36,7 @@ export async function fetchShops(): Promise<{
   const { data, error } = await client
     .from("shops")
     .select(SHOP_SELECT)
-    .in("status", ["active", "pending"])
+    .eq("status", "active")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -202,6 +202,20 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
   }
 
   return data as Shop;
+}
+
+export async function deleteShop(shopId: string): Promise<void> {
+  const client = await ensureAnonymousSession();
+
+  if (!client) {
+    throw new Error("missing_supabase_env");
+  }
+
+  const { error } = await client.from("shops").delete().eq("id", shopId);
+  if (error) {
+    console.error("[shops] delete failed", error);
+    throw new Error(error.message || "delete_shop_failed");
+  }
 }
 
 export async function voteShop(shopId: string, voteType: VoteType): Promise<void> {
