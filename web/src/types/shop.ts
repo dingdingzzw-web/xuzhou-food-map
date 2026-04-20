@@ -25,7 +25,11 @@ export interface ShopImage {
 }
 
 export interface ShopUpdateInput {
+  name?: string;
   address?: string;
   reason?: string;
   alias?: string;
+  cover_image_url?: string | null;
+  lat?: number | null;
+  lng?: number | null;
 }

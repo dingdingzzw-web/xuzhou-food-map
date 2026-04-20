@@ -138,7 +138,11 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
     throw new Error("missing_supabase_env");
   }
 
-  const payload: Record<string, string> = {};
+  const payload: Record<string, string | number | null> = {};
+
+  if (typeof input.name === "string" && input.name.trim()) {
+    payload.name = input.name.trim();
+  }
 
   if (typeof input.address === "string" && input.address.trim()) {
     payload.address = input.address.trim();
@@ -150,6 +154,30 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
 
   if (typeof input.alias === "string") {
     payload.alias = input.alias.trim();
+  }
+
+  if (typeof input.cover_image_url === "string") {
+    payload.cover_image_url = input.cover_image_url.trim();
+  }
+
+  if (input.cover_image_url === null) {
+    payload.cover_image_url = null;
+  }
+
+  if (typeof input.lat === "number") {
+    payload.lat = input.lat;
+  }
+
+  if (typeof input.lng === "number") {
+    payload.lng = input.lng;
+  }
+
+  if (input.lat === null) {
+    payload.lat = null;
+  }
+
+  if (input.lng === null) {
+    payload.lng = null;
   }
 
   if (!Object.keys(payload).length) {
