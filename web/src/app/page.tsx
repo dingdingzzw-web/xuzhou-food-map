@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ZoomableMap } from "@/components/map/zoomable-map";
 import { ShopDetailDrawer } from "@/components/shops/shop-detail-drawer";
 import { ShopCard } from "@/components/shops/shop-card";
@@ -19,6 +19,7 @@ export default function Home() {
   const [loadError, setLoadError] = useState("");
   const [pickerCoords, setPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [pickerEnabled, setPickerEnabled] = useState(false);
+  const uploadPanelRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,8 +132,12 @@ export default function Home() {
             placeholder="比如，把子肉、烧烤、辣汤"
           />
         </label>
-        <button type="button" className={styles.uploadButton}>
-          上传一家店
+        <button
+          type="button"
+          className={styles.uploadButton}
+          onClick={() => uploadPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        >
+          去上传
         </button>
       </section>
 
@@ -193,16 +198,18 @@ export default function Home() {
           </div>
         </div>
 
-        <UploadShopPanel
-          onCreateShop={handleCreateShop}
-          selectedCoords={pickerCoords}
-          pickerEnabled={pickerEnabled}
-          onAutoLocate={(coords) => {
-            setPickerCoords(coords);
-            setPickerEnabled(true);
-          }}
-          onTogglePicker={() => setPickerEnabled((current) => !current)}
-        />
+        <section ref={uploadPanelRef}>
+          <UploadShopPanel
+            onCreateShop={handleCreateShop}
+            selectedCoords={pickerCoords}
+            pickerEnabled={pickerEnabled}
+            onAutoLocate={(coords) => {
+              setPickerCoords(coords);
+              setPickerEnabled(true);
+            }}
+            onTogglePicker={() => setPickerEnabled((current) => !current)}
+          />
+        </section>
       </section>
     </main>
   );
