@@ -51,6 +51,13 @@ export function AMapView({
           viewMode: "2D",
         });
 
+        new window.AMap.Marker({
+          map: mapRef.current,
+          position: XUZHOU_CENTER,
+          offset: new window.AMap.Pixel(-8, -8),
+          content: '<div style="width:16px;height:16px;border-radius:999px;background:#2563eb;border:3px solid #ffffff;box-shadow:0 6px 16px rgba(0,0,0,0.18);"></div>',
+        });
+
         setMessage("高德地图已接入");
       } catch (error) {
         console.error("[amap] init failed", error);
@@ -92,7 +99,8 @@ export function AMapView({
     const nextMarkers = shopsWithCoords.map((shop) => {
       const isActive = shop.id === activeShopId;
       const marker = new AMap.Marker({
-        position: [shop.lng, shop.lat],
+        map: mapRef.current,
+        position: [Number(shop.lng), Number(shop.lat)],
         title: shop.name,
         offset: new AMap.Pixel(-10, -10),
         content: `<div style="display:flex;align-items:center;justify-content:center;width:${isActive ? 22 : 18}px;height:${isActive ? 22 : 18}px;border-radius:999px;background:${isActive ? "#b2451d" : "#d66f2d"};border:3px solid #fff6ec;box-shadow:0 6px 16px rgba(0,0,0,0.18);"></div>`,
@@ -107,12 +115,10 @@ export function AMapView({
     if (nextMarkers.length === 1) {
       const onlyShop = shopsWithCoords[0];
       if (onlyShop) {
-        mapRef.current.add?.(nextMarkers);
-        mapRef.current.setZoomAndCenter?.(15, [onlyShop.lng, onlyShop.lat]);
+        mapRef.current.setZoomAndCenter?.(15, [Number(onlyShop.lng), Number(onlyShop.lat)]);
         setMessage(`地图已定位到 ${onlyShop.name}`);
       }
     } else if (nextMarkers.length > 1) {
-      mapRef.current.add?.(nextMarkers);
       mapRef.current.setFitView?.(nextMarkers);
       setMessage(`地图已标注 ${nextMarkers.length} 家店`);
     }
