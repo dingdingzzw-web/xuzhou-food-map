@@ -124,12 +124,16 @@ export function UploadShopPanel({
           lat: DEFAULT_LAT,
           lng: DEFAULT_LNG,
         });
-      } else {
-        setFeedback("这次没传上去，先检查 Supabase 配置。");
       }
     } catch (error) {
       console.error("[shops] create failed", error);
-      setFeedback("上传失败了，稍后再试。\n如果你还没配 Supabase，也可能是这个原因。");
+      const message = error instanceof Error ? error.message : "unknown_create_error";
+
+      if (message === "missing_supabase_env") {
+        setFeedback("还没配 Supabase 环境变量，所以现在没法真写入。把 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY 配到 Vercel 后再试。");
+      } else {
+        setFeedback(`上传失败：${message}`);
+      }
     } finally {
       setSubmitting(false);
     }

@@ -49,11 +49,11 @@ export async function fetchShops(): Promise<{
   };
 }
 
-export async function createShop(input: CreateShopInput): Promise<Shop | null> {
+export async function createShop(input: CreateShopInput): Promise<Shop> {
   const client = await ensureAnonymousSession();
 
   if (!client) {
-    return null;
+    throw new Error("missing_supabase_env");
   }
 
   const payload = {
@@ -76,7 +76,7 @@ export async function createShop(input: CreateShopInput): Promise<Shop | null> {
 
   if (error) {
     console.error("[shops] create failed", error);
-    return null;
+    throw new Error(error.message || "create_shop_failed");
   }
 
   return data as Shop;
