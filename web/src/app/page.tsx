@@ -118,30 +118,11 @@ export default function Home() {
             第一版先把点位、补图、好次 / 包次跑通。主地图走徐州自定义底图，站内负责种草，导航交给外部地图 App。
           </p>
         </div>
-
-        <div className={styles.heroMeta}>
-          <div>
-            <strong>当前阶段</strong>
-            <span>MVP 骨架</span>
-          </div>
-          <div>
-            <strong>已定文案</strong>
-            <span>好次 / 包次</span>
-          </div>
-          <div>
-            <strong>技术栈</strong>
-            <span>Next.js + Supabase + GeoJSON</span>
-          </div>
-          <div>
-            <strong>数据来源</strong>
-            <span>{dataSource === "supabase" ? "Supabase 实时数据" : "本地 mock 数据（待接真环境）"}</span>
-          </div>
-        </div>
       </section>
 
       <section className={styles.toolbar}>
         <label className={styles.searchBox}>
-          <span>搜一家想吃的</span>
+          <span>搜索</span>
           <input
             value={keyword}
             onChange={(event) => setKeyword(event.target.value)}
