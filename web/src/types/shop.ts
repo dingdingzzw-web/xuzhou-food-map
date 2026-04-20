@@ -1,5 +1,7 @@
 export type VoteType = "good" | "bad";
 
+export type ShopStatus = "active" | "hidden" | "pending";
+
 export interface Shop {
   id: string;
   name: string;
@@ -10,6 +12,7 @@ export interface Shop {
   reason: string;
   creator_name: string;
   alias?: string | null;
+  status?: ShopStatus | null;
   good_count: number;
   bad_count: number;
   created_at?: string;
@@ -32,4 +35,5 @@ export interface ShopUpdateInput {
   cover_image_url?: string | null;
   lat?: number | null;
   lng?: number | null;
+  status?: ShopStatus;
 }

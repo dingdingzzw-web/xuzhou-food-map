@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { fetchShops, updateShopDetails } from "@/lib/shops";
+import { ensureAnonymousSession, updateShopDetails } from "@/lib/shops";
 import type { Shop } from "@/types/shop";
 import styles from "./page.module.css";
 
@@ -24,6 +24,7 @@ export default function ManagePage() {
     cover_image_url: "",
     lat: "",
     lng: "",
+    status: "active",
   });
 
   useEffect(() => {
@@ -33,10 +34,16 @@ export default function ManagePage() {
 
     async function load() {
       try {
-        const result = await fetchShops();
+        const client = await ensureAnonymousSession();
+        if (!client) throw new Error("missing_supabase_env");
+        const { data, error } = await client
+          .from("shops")
+          .select("id, name, address, lat, lng, cover_image_url, reason, creator_name, alias, status, good_count, bad_count, created_at, updated_at")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
         if (cancelled) return;
-        setShops(result.shops);
-        setActiveShopId((current) => current || result.shops[0]?.id || "");
+        setShops((data ?? []) as Shop[]);
+        setActiveShopId((current) => current || data?.[0]?.id || "");
         setFeedback("");
       } catch (error) {
         const message = error instanceof Error ? error.message : "unknown_manage_load_error";
@@ -80,6 +87,7 @@ export default function ManagePage() {
       cover_image_url: activeShop.cover_image_url || "",
       lat: activeShop.lat == null ? "" : String(activeShop.lat),
       lng: activeShop.lng == null ? "" : String(activeShop.lng),
+      status: activeShop.status || "active",
     });
   }, [activeShop]);
 
@@ -99,6 +107,7 @@ export default function ManagePage() {
         cover_image_url: form.cover_image_url || null,
         lat: form.lat ? Number(form.lat) : null,
         lng: form.lng ? Number(form.lng) : null,
+        status: form.status as "active" | "hidden" | "pending",
       });
 
       setShops((current) => current.map((shop) => (shop.id === updated.id ? updated : shop)));
@@ -208,6 +217,14 @@ export default function ManagePage() {
                 <span>封面图 URL（留空则清空）</span>
                 <input value={form.cover_image_url} onChange={(event) => setForm((current) => ({ ...current, cover_image_url: event.target.value }))} />
               </label>
+              <label>
+                <span>状态</span>
+                <select value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}>
+                  <option value="active">active，前台可见</option>
+                  <option value="pending">pending，前台暂时可见但待审核</option>
+                  <option value="hidden">hidden，前台隐藏</option>
+                </select>
+              </label>
               <div className={styles.coordRow}>
                 <label>
                   <span>纬度</span>
@@ -218,9 +235,31 @@ export default function ManagePage() {
                   <input value={form.lng} onChange={(event) => setForm((current) => ({ ...current, lng: event.target.value }))} />
                 </label>
               </div>
-              <button type="submit" className={styles.button} disabled={saving}>
-                {saving ? "保存中..." : "保存修改"}
-              </button>
+              <div className={styles.actionRow}>
+                <button type="submit" className={styles.button} disabled={saving}>
+                  {saving ? "保存中..." : "保存修改"}
+                </button>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={async () => {
+                    if (!activeShop) return;
+                    setSaving(true);
+                    try {
+                      const updated = await updateShopDetails(activeShop.id, { status: "hidden" });
+                      setShops((current) => current.map((shop) => (shop.id === updated.id ? updated : shop)));
+                      setFeedback("已隐藏这条店铺，前台不会再展示。");
+                    } catch (error) {
+                      const message = error instanceof Error ? error.message : "unknown_hide_error";
+                      setFeedback(`隐藏失败：${message}`);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                >
+                  立即隐藏
+                </button>
+              </div>
             </form>
           ) : (
             <div className={styles.empty}>先从左边选一家店。</div>

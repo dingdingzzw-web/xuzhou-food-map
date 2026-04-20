@@ -136,15 +136,30 @@
   gap: 12px;
 }
 
-.button {
+.actionRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.button,
+.secondaryButton {
   border: 0;
   border-radius: 16px;
   padding: 14px 18px;
-  background: #d66f2d;
-  color: #fffdf8;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.button {
+  background: #d66f2d;
+  color: #fffdf8;
+}
+
+.secondaryButton {
+  background: #f0dfcf;
+  color: #7a4c2d;
 }
 
 .feedback {

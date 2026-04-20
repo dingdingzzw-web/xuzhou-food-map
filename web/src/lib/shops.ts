@@ -3,7 +3,7 @@ import type { CreateShopInput } from "@/components/shops/upload-shop-panel";
 import type { Shop, ShopImage, ShopUpdateInput, VoteType } from "@/types/shop";
 
 const SHOP_SELECT =
-  "id, name, address, lat, lng, cover_image_url, reason, creator_name, alias, good_count, bad_count, created_at, updated_at";
+  "id, name, address, lat, lng, cover_image_url, reason, creator_name, alias, status, good_count, bad_count, created_at, updated_at";
 
 export async function ensureAnonymousSession() {
   const client = getSupabaseBrowserClient();
@@ -36,6 +36,7 @@ export async function fetchShops(): Promise<{
   const { data, error } = await client
     .from("shops")
     .select(SHOP_SELECT)
+    .in("status", ["active", "pending"])
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -178,6 +179,10 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
 
   if (input.lng === null) {
     payload.lng = null;
+  }
+
+  if (typeof input.status === "string") {
+    payload.status = input.status;
   }
 
   if (!Object.keys(payload).length) {
