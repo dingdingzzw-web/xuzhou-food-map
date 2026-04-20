@@ -31,6 +31,7 @@ export function AMapView({
     clearMap?: () => void;
     setZoomAndCenter?: (zoom: number, center: [number, number]) => void;
   } | null>(null);
+  const markersRef = useRef<unknown[]>([]);
   const [message, setMessage] = useState("正在接入徐州地图...");
 
   useEffect(() => {
@@ -86,6 +87,7 @@ export function AMapView({
     );
 
     mapRef.current.clearMap?.();
+    markersRef.current = [];
 
     const nextMarkers = shopsWithCoords.map((shop) => {
       const marker = new AMap.Marker({
@@ -103,6 +105,8 @@ export function AMapView({
       return marker;
     });
 
+    markersRef.current = nextMarkers;
+
     if (nextMarkers.length === 1) {
       const onlyShop = shopsWithCoords[0];
       if (onlyShop) {
@@ -114,6 +118,11 @@ export function AMapView({
       mapRef.current.add?.(nextMarkers);
       mapRef.current.setFitView?.(nextMarkers);
       setMessage(`地图已标注 ${nextMarkers.length} 家店`);
+    }
+
+    const activeMarker = nextMarkers.find((_, index) => shopsWithCoords[index]?.id === activeShopId);
+    if (activeMarker) {
+      mapRef.current.setFitView?.([activeMarker]);
     } else {
       setMessage("当前店铺还没有可展示的定位点");
     }

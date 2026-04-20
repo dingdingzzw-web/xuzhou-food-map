@@ -140,6 +140,7 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
     throw new Error("missing_supabase_env");
   }
 
+  const normalizedShopId = shopId.trim();
   const payload: Record<string, string | number | null> = {};
 
   if (typeof input.name === "string" && input.name.trim()) {
@@ -193,7 +194,7 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
   const { data, error } = await client
     .from("shops")
     .update(payload)
-    .eq("id", shopId)
+    .eq("id", normalizedShopId)
     .select(SHOP_SELECT)
     .maybeSingle();
 
@@ -203,7 +204,7 @@ export async function updateShopDetails(shopId: string, input: ShopUpdateInput):
   }
 
   if (!data) {
-    throw new Error("shop_not_found_or_not_updatable");
+    throw new Error(`shop_not_found_or_not_updatable:${normalizedShopId}`);
   }
 
   return data as Shop;

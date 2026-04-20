@@ -105,7 +105,11 @@ export function ShopDetailDrawer({
       setFeedback("商家补充信息已更新。");
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown_update_error";
-      setFeedback(`补充信息失败：${message}`);
+      if (message.startsWith("shop_not_found_or_not_updatable")) {
+        setFeedback("补充信息失败，这家店当前不能被更新。大概率是数据库 RLS 还没放开 shops 的 update 策略。");
+      } else {
+        setFeedback(`补充信息失败：${message}`);
+      }
     } finally {
       setSubmittingDetails(false);
     }
